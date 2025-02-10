@@ -4,8 +4,8 @@ import Link from "next/link";
 
 const Navigation = () => {
   return (
-    <nav className="flex-between fixed background-light900_black200 z-50 w-full p-6 dark:shadow-none sm:px-12 shadow-light-300 gap-5">
-      <Link href="/" className="flex item-center gap-1">
+    <nav className="flex-between fixed z-50 w-full gap-5 p-6 shadow-light-300 dark:shadow-none sm:px-12">
+      <Link href="/" className="flex items-center gap-1">
         <Image
           src="/images/site-logo.svg"
           width={23}
