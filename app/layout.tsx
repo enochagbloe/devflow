@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Nav from "@/components/navigation/nav/nav";
 import React from "react";
 import localFont from "next/font/local"
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "react-hot-toast";
 
 
 const inter = localFont({
-  src: "../fonts/interVF.ttf",
+  src: "./fonts/interVF.ttf",
   variable: "--font-inter",
   weight: "100 200 300 400 500 600 700 800 900",
 });
 
 const spaceGrotesk = localFont({
-  src : "../fonts/SpaceGroteskVF.ttf",
+  src : "./fonts/SpaceGroteskVF.ttf",
   variable: "--font-SpaceGrotesk",
   weight: "300 400 500 600 700 800 900",
 });
@@ -41,10 +41,11 @@ export default function RootLayout({
         defaultTheme="system"
         enableSystem={true}
         disableTransitionOnChange={true}>
-        <Nav />
         {children}
         </ThemeProvider>
+        <Toaster/>
       </body>
+
     </html>
   );
 }
