@@ -1,6 +1,7 @@
 import SocialAuthForms from "@/components/forms/SocialAuthForms";
 import Image from "next/image";
 import { ReactNode } from "react";
+import { Toaster } from "react-hot-toast";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
   return (
@@ -23,9 +24,8 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
           />
         </div>
         {children}
-
         <SocialAuthForms />
-
+        <Toaster/>
       </section>
     </main>
   );

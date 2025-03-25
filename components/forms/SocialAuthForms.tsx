@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import ROUTES from "@/constants/routes";
-import { signIn } from "@/auth";
+import { signIn } from "next-auth/react";
 
 const SocialAuthForms = () => {
 
@@ -52,5 +52,3 @@ const SocialAuthForms = () => {
 };
 
 export default SocialAuthForms;
-
-
