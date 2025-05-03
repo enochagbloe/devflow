@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import React from "react";
+import React, { ReactNode } from "react";
 import localFont from "next/font/local"
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "react-hot-toast";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/auth";
 
 
 const inter = localFont({
@@ -26,13 +28,12 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const RootLayout = async ({children}: {children : ReactNode}) => {
+
+  const session = await auth()
   return (
     <html lang="en" suppressHydrationWarning>
+      <SessionProvider session={session}>
       <body
         className={`${inter.className} ${spaceGrotesk.variable} antialiased`}
       >
@@ -45,6 +46,8 @@ export default function RootLayout({
         </ThemeProvider>
         <Toaster/>
       </body>
+      </SessionProvider>
     </html>
   );
 }
+export default RootLayout;

@@ -1,11 +1,7 @@
-import React from 'react'
+import React from "react";
 
-const page = () => {
-  return (
-    <div>
-      FOOD
-    </div>
-  )
-}
+const Community = () => {
+  return <div className="p-70">none</div>;
+};
 
-export default page
+export default Community;
