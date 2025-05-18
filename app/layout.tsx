@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import React, { ReactNode } from "react";
-import localFont from "next/font/local"
+import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
-
 
 const inter = localFont({
   src: "./fonts/interVF.ttf",
@@ -15,39 +14,47 @@ const inter = localFont({
 });
 
 const spaceGrotesk = localFont({
-  src : "./fonts/SpaceGroteskVF.ttf",
+  src: "./fonts/SpaceGroteskVF.ttf",
   variable: "--font-SpaceGrotesk",
   weight: "300 400 500 600 700 800 900",
 });
 
 export const metadata: Metadata = {
   title: "Dev Flow",
-  description:"A community-driven platform for asking and answering programming questions. Get help, share knowledge, and collaborate with developers from around the world. Explore topics in web development, mobile app development, algorithms, data structures, and more.",
-  icons:{
+  description:
+    "A community-driven platform for asking and answering programming questions. Get help, share knowledge, and collaborate with developers from around the world. Explore topics in web development, mobile app development, algorithms, data structures, and more.",
+  icons: {
     icon: "../public/images/site-logo.svg",
-  }
+  },
 };
 
-const RootLayout = async ({children}: {children : ReactNode}) => {
-
-  const session = await auth()
+const RootLayout = async ({ children }: { children: ReactNode }) => {
+  const session = await auth();
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+        />
+      </head>
       <SessionProvider session={session}>
-      <body
-        className={`${inter.className} ${spaceGrotesk.variable} antialiased`}
-      >
-        <ThemeProvider
-        attribute= "class"
-        defaultTheme="system"
-        enableSystem={true}
-        disableTransitionOnChange={true}>
-        {children}
-        </ThemeProvider>
-        <Toaster/>
-      </body>
+        <body
+          className={`${inter.className} ${spaceGrotesk.variable} antialiased`}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem={true}
+            disableTransitionOnChange={true}
+          >
+            {children}
+          </ThemeProvider>
+          <Toaster />
+        </body>
       </SessionProvider>
     </html>
   );
-}
+};
 export default RootLayout;

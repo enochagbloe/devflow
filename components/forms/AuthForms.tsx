@@ -64,7 +64,7 @@ const AuthForm = <T extends FieldValues>({
         {Object.keys(defaultValues).map((fieldName) => (
           <FormField
             key={fieldName}
-            name={fieldName as keyof T}
+            name={fieldName as unknown as import("react-hook-form").Path<T>}
             control={form.control}
             render={({ field }) => (
               <FormItem className="flex w-full flex-col gap-2.5">
