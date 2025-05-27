@@ -195,4 +195,9 @@ export const techMap: { [key: string]: string } = {
   
     // Three.js
     threejs: "devicon-threejs-original",
+    "three.js": "devicon-threejs-original",
+    // Vite
+    vite: "devicon-vitejs-plain",
+    // SolidJS
+    solidjs: "devicon-solidjs-plain",
   };
