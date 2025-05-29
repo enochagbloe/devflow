@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ROUTES from "@/constants/routes";
 import LocalSearch from "@/components/search/localSearch";
-
+import HomeFilters from "./filters/HomeFilter";
 // static data for now
 const questions = [
   {
@@ -87,7 +87,7 @@ const Home = async ({ searchParams }: SearchParams) => {
         />
       </section>
       {/* filters */}
-      Home Filters
+      <HomeFilters/>
       {/* map over different question  */}
       <div className="mt-10 w-full flex-col gap-6">
         {filterquestions.map((question) => (
