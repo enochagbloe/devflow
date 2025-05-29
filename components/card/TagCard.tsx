@@ -18,11 +18,11 @@ interface Props {
 // define your props above in an object
 const TagCard = ({ _id, name, questions, showCount }: Props) => {
 
-    const iconclass = getDeviconClassName(name)
+   const iconclass = getDeviconClassName(name)
 
   return (
     <Link href={ROUTES.TAGS(_id)} className="flex justify-between gap-3">
-      <Badge className="subtle-medium background-light800_dark300 text-light400_light500 rounded-md border-none px-4 py-2 uppercase ">
+      <Badge className="subtle-medium background-light800_dark300 text-light400_light500 rounded-md border-none px-4 py-2 uppercase">
         <div className="flex-center space-x-2">
           <i className={`${iconclass} text-sm`}/>
           <span>{name}</span>
@@ -36,3 +36,5 @@ const TagCard = ({ _id, name, questions, showCount }: Props) => {
 };
 
 export default TagCard;
+
+
