@@ -46,7 +46,7 @@ const questions = [
     title: "How code javascript",
     description: "I want to learn how to code javascript",
     tags: [
-      { _id: "1", name: "nextjs" },
+      { _id: "1", name: "javascript" },
       { _id: "2", name: "javascript" },
       { _id: "3", name: "typescript" },
     ],
@@ -62,11 +62,18 @@ interface SearchParams {
   searchParams: { [key: string]: string };
 }
 const Home = async ({ searchParams }: SearchParams) => {
-  const { query = "" } = await searchParams;
+  const { query = "", filter = "" } = await searchParams;
 
-  const filterquestions = questions.filter((question) =>
-    question.title.toLowerCase().includes(query?.toLowerCase())
-  );
+  const filtereQuestions = questions.filter((question) => {
+    const matchQuery = question.title
+      .toLowerCase()
+      .includes(query.toLowerCase());
+    const matchFilter = filter
+      ? question.tags[0].name.toLowerCase() === filter.toLowerCase()
+      : true;
+    return matchQuery && matchFilter;
+  });
+
   return (
     <>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
@@ -87,10 +94,10 @@ const Home = async ({ searchParams }: SearchParams) => {
         />
       </section>
       {/* filters */}
-      <HomeFilters/>
+      <HomeFilters />
       {/* map over different question  */}
       <div className="mt-10 w-full flex-col gap-6">
-        {filterquestions.map((question) => (
+        {filtereQuestions.map((question) => (
           <h1 key={question._id}>{question.title}</h1>
         ))}
       </div>
