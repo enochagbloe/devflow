@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 
 interface Props {
-  imageUrl: string;
+  imgUrl: string;
   alt: string;
   value: string | number;
   title: string;
@@ -13,7 +13,7 @@ interface Props {
   href?: string;
 }
 const Metric = ({
-  imageUrl,
+  imgUrl,
   alt,
   value,
   title,
@@ -26,7 +26,7 @@ const Metric = ({
     <>
       <Image
         alt={alt}
-        src={imageUrl}
+        src={imgUrl}
         className={` rounded-full object-contain ${imgStyles}`}
         width={16}
         height={16}
