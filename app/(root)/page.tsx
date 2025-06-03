@@ -5,6 +5,7 @@ import Link from "next/link";
 import ROUTES from "@/constants/routes";
 import LocalSearch from "@/components/search/localSearch";
 import HomeFilters from "./filters/HomeFilter";
+import QuestionCards from "@/components/card/QuestionCards";
 // static data for now
 const questions = [
   {
@@ -14,11 +15,9 @@ const questions = [
     tags: [
       { _id: "1", name: "react" },
       { _id: "2", name: "javascript" },
-      { _id: "3", name: "typescript" },
       { _id: "4", name: "next js" },
-      { _id: "5", name: "react-query" },
     ],
-    author: [{ _id: "1", name: "John Doe" }],
+    author: [{ _id: "1", name: "Enoch", image:"https://www.shareicon.net/data/512x512/2016/09/15/829459_man_512x512.png" , }],
     answers: 10,
     views: 50,
     upvotes: 5,
@@ -32,13 +31,11 @@ const questions = [
       { _id: "1", name: "react" },
       { _id: "2", name: "javascript" },
       { _id: "3", name: "typescript" },
-      { _id: "4", name: "next js" },
-      { _id: "5", name: "react" },
     ],
-    author: [{ _id: "1", name: "John Doe" }],
-    answers: 10,
-    views: 50,
-    upvotes: 5,
+    author: [{ _id: "1", name: "Aaron Doe", image: "https://img.freepik.com/premium-vector/person-with-blue-shirt-that-says-name-person_1029948-7040.jpg?semt=ais_hybrid&w=740"}],
+    answers: 310,
+    views: "50k",
+    upvotes: 915,
     createdAt: new Date(),
   },
   {
@@ -50,10 +47,10 @@ const questions = [
       { _id: "2", name: "javascript" },
       { _id: "3", name: "typescript" },
     ],
-    author: [{ _id: "1", name: "John Doe" }],
+    author: [{ _id: "1", name: "John Doe", image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5bnd-AjFy_uS_R7RiTvkhY_QPh63r0xrIgqq1gn-yKj1YB3c5OZh_rYnYD4KIF3uCdVo&usqp=CAU"}],
     answers: 10,
     views: 50,
-    upvotes: 5,
+    upvotes: 22,
     createdAt: new Date(),
   },
 ];
@@ -64,7 +61,7 @@ interface SearchParams {
 const Home = async ({ searchParams }: SearchParams) => {
   const { query = "", filter = "" } = await searchParams;
 
-  const filtereQuestions = questions.filter((question) => {
+  const filteredQuestions = questions.filter((question) => {
     const matchQuery = question.title
       .toLowerCase()
       .includes(query.toLowerCase());
@@ -97,8 +94,9 @@ const Home = async ({ searchParams }: SearchParams) => {
       <HomeFilters />
       {/* map over different question  */}
       <div className="mt-10 w-full flex-col gap-6">
-        {filtereQuestions.map((question) => (
-          <h1 key={question._id}>{question.title}</h1>
+        {filteredQuestions.map((question) => (
+          // <QuestionCard key={question._id} question={question} />
+          <QuestionCards key={question._id} question={question} />
         ))}
       </div>
     </>

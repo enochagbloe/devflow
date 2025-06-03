@@ -8,10 +8,8 @@ import React, { useState } from "react";
 const filters = [
   {name: "JavaScript", value: "javascript"},
   {name: "React", value: "react"},
-  // { name: "Newest", value: "newest" },
- // { name: "Popular", value: "popular" },
- // { name: "Unanswered", value: "unanswered" },
- // { name: "Recommended", value: "recommended" },
+  {name: "Next.js", value: "nextjs"},
+  {name: "Tailwind", value: "tailwind"},
 ];
 const HomeFilter = () => {
   // to give the filters a differnt classNames if it is active
