@@ -32,7 +32,7 @@ const questions = [
     description: "I want to learn JavaScript, can anyone help me?",
     tags: [
       { _id: "1", name: "JavaScript" },
-      { _id: "2", name: "JavaScript" },
+    { _id: "2", name: "JavaScript" },
     ],
     author: {
       _id: "1",
