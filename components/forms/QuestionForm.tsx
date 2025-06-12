@@ -1,7 +1,7 @@
 "use client";
 import { AskQuestionShema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -14,10 +14,16 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { MDXEditorMethods } from "@mdxeditor/editor";
+import dynamic from "next/dynamic";
 
+const Editor = dynamic(() => import("@/components/editor"), {
+  ssr: false,
+});
 const QuestionForm = () => {
+  // use ref for the Editor
+  const Ref = useRef<MDXEditorMethods>(null);
   // specify the question form validation here
-
   const form = useForm({
     resolver: zodResolver(AskQuestionShema),
     defaultValues: {
@@ -72,7 +78,13 @@ const QuestionForm = () => {
                 Detailed explanation of your question{" "}
                 <span className="text-primary-500">*</span>
               </FormLabel>
-              <FormControl>Editor</FormControl>
+              <FormControl>
+                <Editor
+                  editorRef={Ref}
+                  value={field.value}
+                  fieldChange={field.onChange}
+                />
+              </FormControl>
               <FormDescription className="mt-2.5 pb-5">
                 {" "}
                 please be specific in your question
@@ -111,7 +123,11 @@ const QuestionForm = () => {
         />
         <div className="m-t-16 flex justify-end">
           <Button
-          type="submit" className="primary-gradient ft justify-end !text-white-900">Ask question</Button>
+            type="submit"
+            className="primary-gradient ft justify-end !text-white-900"
+          >
+            Ask question
+          </Button>
         </div>
       </form>
     </Form>
