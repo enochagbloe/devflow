@@ -32,7 +32,7 @@ const questions = [
     description: "I want to learn JavaScript, can anyone help me?",
     tags: [
       { _id: "1", name: "JavaScript" },
-    { _id: "2", name: "JavaScript" },
+      { _id: "2", name: "JavaScript" },
     ],
     author: {
       _id: "1",
@@ -44,6 +44,25 @@ const questions = [
     answers: 5,
     views: 100,
     createdAt: new Date("2021-09-01"),
+  },
+  {
+    _id: "3",
+    title: "How to learn python for web developer?",
+    description: "I want to learn React, can anyone help me?",
+    tags: [
+      { _id: "1", name: "Django" },
+      { _id: "2", name: "python" },
+    ],
+    author: {
+      _id: "1",
+      name: "John Doe",
+      image:
+        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
+    },
+    upvotes: 10,
+    answers: 50,
+    views: 100,
+    createdAt: new Date(),
   },
 ];
 

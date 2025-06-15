@@ -1,7 +1,7 @@
 "use client";
 import { AskQuestionShema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -16,6 +16,9 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { MDXEditorMethods } from "@mdxeditor/editor";
 import dynamic from "next/dynamic";
+import { z } from "zod";
+// import { Key, Tag } from "lucide-react";
+import TagCard from "../card/TagCard";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
@@ -24,7 +27,7 @@ const QuestionForm = () => {
   // use ref for the Editor
   const Ref = useRef<MDXEditorMethods>(null);
   // specify the question form validation here
-  const form = useForm({
+  const form = useForm<z.infer<typeof AskQuestionShema>>({
     resolver: zodResolver(AskQuestionShema),
     defaultValues: {
       content: "",
@@ -33,9 +36,52 @@ const QuestionForm = () => {
     },
   });
 
-  // event handler
-  const handleCreateQuestion = (data: any) => {
-    // To do
+  // handle input key down for tags
+  const handleInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    field: { value: string[] }
+  ) => {
+    // what happens when thee input key is pressed
+    if (e.key === "Enter") {
+      e.preventDefault();
+      // get the input value and trim it
+      const inputTag = e.currentTarget.value.trim();
+
+      // check if the input tag is not empty, does not exceed 15 characters, and is not already in the field value
+      if (
+        inputTag &&
+        inputTag.length <= 15 &&
+        !field.value.includes(inputTag)
+      ) {
+        form.setValue("tags", [...field.value, inputTag]);
+        form.clearErrors("tags");
+        e.currentTarget.value = "";
+      } else if (inputTag.length > 15) {
+        alert("Tag cannot exceed 15 characters.");
+        form.setError("tags", {
+          type: "manual",
+          message: "Tag cannot exceed 15 characters.",
+        });
+        // Tag already exists
+      } else if (field.value.includes(inputTag)) {
+        form.setError("tags", {
+          type: "manual",
+          message: "Tag already exists.",
+        });
+      }
+      e.currentTarget.value = "";
+    }
+    // log the current tags and input tag
+    console.log("Current Tags:", field.value);
+  };
+
+  const removeTags = (tag: string, field: { value: string[] }) => {
+    const removeTags= field.value.filter((t) => t !== tag);
+    form.setValue("tags", removeTags);
+  }
+  const handleCreateQuestion = (data: z.infer<typeof AskQuestionShema>) => {
+    console.log("Form Data:", data);
+    // Here you can handle the form submission, e.g., send data to an API
   };
 
   return (
@@ -64,7 +110,7 @@ const QuestionForm = () => {
                 {" "}
                 please be specific in your question
               </FormDescription>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -108,10 +154,14 @@ const QuestionForm = () => {
                   <div>
                     <Input
                       className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] rounded-md border focus:outline-none"
-                      {...field}
                       placeholder="Add tags..."
+                      onKeyDown={(e) => handleInputKeyDown(e, field)}
                     />
-                    Tags
+                    {field.value.length > 0 && (
+                      <div className="flex-start gap-3 mt-3.4 flex-wrap">{field?.value?.map((tag: string) => 
+                      <TagCard _id={tag} key={tag} name={tag} compact 
+                      isButton remove handleRemove= {(e)=> removeTags(tag, field)} />)}</div>
+                    )}
                   </div>
                 </div>
               </FormControl>
@@ -124,7 +174,7 @@ const QuestionForm = () => {
         <div className="m-t-16 flex justify-end">
           <Button
             type="submit"
-            className="primary-gradient ft justify-end !text-white-900"
+            className="primary-gradient justify-end !text-white-900"
           >
             Ask question
           </Button>

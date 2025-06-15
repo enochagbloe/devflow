@@ -30,7 +30,7 @@ import {
 } from "@mdxeditor/editor";
 import { basicDark } from "cm6-theme-basic-dark";
 import "./dark-editor.css";
-import '@mdxeditor/editor/style.css';
+import "@mdxeditor/editor/style.css";
 import { useTheme } from "next-themes";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 // Only import this to the next file
@@ -48,7 +48,7 @@ const Editor = ({ value, editorRef, fieldChange, ...props }: Props) => {
   return (
     <MDXEditor
       key={resolvedTheme} // Ensure the editor re-renders on theme change
-      className="border background-light800_dark200 light-border-2 markdown-editor w-full"
+      className="border background-light800_dark200 light-border-2 markdown-editor w-full grid dark-editor"
       markdown={value}
       onChange={fieldChange}
       plugins={[
@@ -86,7 +86,7 @@ const Editor = ({ value, editorRef, fieldChange, ...props }: Props) => {
           autoLoadLanguageSupport: true,
           codeMirrorExtensions: theme,
         }),
-        diffSourcePlugin({viewMode: 'rich-text', diffMarkdown: ''}),
+        diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "" }),
         // Add a toolbar plugin if you want to use the toolbar
         toolbarPlugin({
           toolbarContents: () => (
