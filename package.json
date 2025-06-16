@@ -25,6 +25,7 @@
     "framer-motion": "^12.6.3",
     "lucide-react": "^0.475.0",
     "minimist": "^1.2.8",
+    "mongoose": "^8.15.2",
     "next": "^15.2.1",
     "next-auth": "^5.0.0-beta.25",
     "next-theme": "^0.1.5",
