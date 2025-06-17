@@ -1,8 +1,8 @@
-import { models, Schema, model } from "mongoose";
+import { models, Schema, model, Types } from "mongoose";
 
 export interface ITagQuestion {
-    tags: Schema.Types.ObjectId; // Reference to the Tag model
-    question: Schema.Types.ObjectId; // Reference to the Question model
+    tags: Types.ObjectId; // Reference to the Tag model
+    question:Types.ObjectId; // Reference to the Question model
 }
 
 const TagQuestionSchema = new Schema<ITagQuestion>({

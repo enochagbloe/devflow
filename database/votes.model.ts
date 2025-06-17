@@ -1,8 +1,8 @@
-import { models, Schema, model } from "mongoose";
+import { models, Schema, model, Types } from "mongoose";
 
 export interface IVote {
     author: Schema.Types.ObjectId;
-    id: Schema.Types.ObjectId;
+    id: Types.ObjectId;
     type: "question" | "answer";
     voteType: "upvote" | "downvote";
 }
