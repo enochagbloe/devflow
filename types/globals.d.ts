@@ -12,7 +12,7 @@ interface author{
 interface Question {
     _id: string;
     title: string;
-    description: string;
+    // description: string;
     tags: Tag[];
     author: author;
     createdAt: Date;
