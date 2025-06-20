@@ -1,10 +1,11 @@
 import mongoose, { Mongoose } from 'mongoose';
+import logger from './logger';
 
 // define the uri for mongoose connection
-const MONGOOSE_URI = process.env.MONGOOSE_URI as string;
+const MONGODB_URI = process.env.MONGODB_URI as string;
 // check if there is no uri defined
-if (!MONGOOSE_URI) {
-  throw new Error('MONGOOSE_URI is not defined in environment variables');
+if (!MONGODB_URI) {
+  throw new Error('MONGODB_URI is not defined in environment variables');
 }
 // cache the mongoose instance
 interface MongooseCache {
@@ -27,18 +28,19 @@ if (!cache) {
 // Function to connect to MongoDB using Mongoose
 const dbConnect = async (): Promise<Mongoose> => {
     if (cache.conn) {
+      logger.info('Using existing mongoose connection');
         return cache.conn;
     }
     // If a connection promise is already in progress, wait for it to resolve
     if (!cache.promise) {
-        cache.promise = mongoose.connect(MONGOOSE_URI, {
+        cache.promise = mongoose.connect(MONGODB_URI, {
             dbName: "devflow",
         })
         .then((result) => {
-            console.log('MongoDB connected successfully');
+            logger.info('MongoDB connected successfully');
             return result;
         }).catch((error) => {
-            console.error('MongoDB connection error:', error);
+            logger.info('MongoDB connection error:', error);
             throw new Error('Failed to connect to MongoDB');
         });
     }
