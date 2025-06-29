@@ -17,6 +17,7 @@ export class RequestError extends Error {
 export class ValidationError extends RequestError {
   constructor(fieldErrors: Record<string, string[]>) {
     const message = ValidationError.formatFieldErrors(fieldErrors);
+    // call the constructor of the parent class
     super(400, message, fieldErrors);
     this.name = "ValidationError";
     this.errors = fieldErrors;
@@ -26,7 +27,7 @@ export class ValidationError extends RequestError {
     const formattedMessages = Object.entries(errors).map(
       ([field, messages]) => {
         const fieldName = field.charAt(0).toUpperCase() + field.slice(1);
-
+        // check if the first message is "Required"
         if (messages[0] === "Required") {
           return `${fieldName} is required`;
         } else {
@@ -38,7 +39,7 @@ export class ValidationError extends RequestError {
     return formattedMessages.join(", ");
   }
 }
-
+// create a new class 
 export class NotFoundError extends RequestError {
   constructor(resource: string) {
     super(404, `${resource} not found`);

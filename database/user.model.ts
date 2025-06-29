@@ -35,7 +35,7 @@ const UserSchema = new Schema({
 // define the user model and if the user model already exists, create a new model
 // define the type interface in the model
 // this will allow us to use the IUser interface in the user model
-const User = models?.user || model<IUser>("User", UserSchema);
+const User = models?.User || model<IUser>("User", UserSchema);
 export default User;
 
 
