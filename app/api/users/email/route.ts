@@ -4,11 +4,14 @@ import { UserSchema } from "@/lib/validation";
 import { APIErrorResponse } from "@/types/globals";
 import User from "@/database/user.model";
 import { NextResponse } from "next/server";
+import dbConnect from "@/lib/mongoose";
 
 export async function POST(request: Request) {
     // extract the email from the request body
     const { email } = await request.json();
     try {
+        // CONNECT TO DATABASE
+        await dbConnect();
         // validate the email
         const validationEmail = UserSchema.partial().safeParse({email});
         // if not the email 

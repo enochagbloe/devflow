@@ -1,12 +1,13 @@
 import Link from "next/link";
-
 import QuestionCard from "@/components/card/QuestionCards";
 import HomeFilter from "@/components/filters/HomeFilter";
 import LocalSearch from "@/components/search/localSearch";
 import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
-import dbConnect from "@/lib/mongoose";
 import handleError from "@/lib/handler/error";
+import { api } from "@/lib/api";
+// import dbConnect from "@/lib/mongoose";
+
 
 const questions = [
   {
@@ -70,7 +71,8 @@ const questions = [
 
 const test = async() => {
   try {
-    await dbConnect()
+    //await dbConnect()
+    return await api.users.getAll();
   } catch (error) {
     return handleError(error);
   }
@@ -81,6 +83,7 @@ interface SearchParams {
 
 const Home = async ({ searchParams }: SearchParams) => {
   const result = await test();
+  console.log(result);
   const { query = "", filter = "" } = await searchParams;
 
   const filteredQuestions = questions.filter((question) => {

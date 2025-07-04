@@ -4,11 +4,14 @@ import { AccountSchema } from "@/lib/validation";
 import { APIErrorResponse } from "@/types/globals";
 import User from "@/database/user.model";
 import { NextResponse } from "next/server";
+import dbConnect from "@/lib/mongoose";
 
 export async function POST(request: Request) {
     // extract the providerAccountId  from the request body
     const { providerAccountId } = await request.json();
     try {
+        // CONNECT TO DATABASE
+        await dbConnect();
         // validate the account
         const account = AccountSchema.partial().safeParse({providerAccountId});
         // if not the account 
