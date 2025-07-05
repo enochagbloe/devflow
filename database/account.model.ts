@@ -10,7 +10,8 @@ export interface IAccount {
   provider: string; // e.g., 'google', 'github', etc.
   providerAccountId: string; // Unique ID from the provider
 }
-const AccountSchema = new Schema(
+export interface IAccountDoc extends IAccount, Document {}
+const AccountSchema = new Schema<IAccount>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },

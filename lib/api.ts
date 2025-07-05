@@ -8,6 +8,14 @@ const API_BASE_URL =
 
 // define the api with the methods (getAll, getById,getByEmail, create, update, delete)
 export const api = {
+  // define the OAuth methods
+  auth: {
+    oAuthSignIn: ({ user, provider, providerAccountId }: SignInWithOAuthParams) => fetchHandler(`${API_BASE_URL}/auth/signin-with-oauth`, {
+      // provider your payload
+      method: "POST",
+      body: JSON.stringify({ user, provider, providerAccountId }),
+    })
+  },
   // Define the users methods
   users: {
     // getAll gets you all the users

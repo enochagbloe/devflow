@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
 import handleError from "@/lib/handler/error";
 import { api } from "@/lib/api";
+import { auth } from "@/auth";
 // import dbConnect from "@/lib/mongoose";
 
 
@@ -82,8 +83,8 @@ interface SearchParams {
 }
 
 const Home = async ({ searchParams }: SearchParams) => {
-  const result = await test();
-  console.log(result);
+  const session = await auth();
+  console.log("Session: ",session);
   const { query = "", filter = "" } = await searchParams;
 
   const filteredQuestions = questions.filter((question) => {
