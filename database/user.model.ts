@@ -1,15 +1,15 @@
 // create a schema for user
 
-import  { model, models, Schema } from "mongoose";
+import  { model, models, Schema, Document } from "mongoose";
+
 
 //accept typescript types
 export interface IUser {
     name: string;
     email: string;
-    password: string;
     username: string;
     bio?: string;
-    avatar: string;
+    image?: string;
     location?: string;
     portfolio?: string;
     reputation?: number;
@@ -17,14 +17,14 @@ export interface IUser {
 
 // Define the schema for the user model
 // This schema defines the structure of the user document in the MongoDB database
+export interface IUserDoc extends IUser, Document {}
 const UserSchema = new Schema({
     // what are the thing or schema the user needs to have
     name:{ type: String, required: true },
-    email:{ type: String, required: true },
-    password:{ type: String, required: true },
-    username:{ type: String, required: true },
-    bio:{ type: String, required: "" },
-    avatar:{ type: String, required: true },
+    email:{ type: String, required: true, unique: true },
+    username:{ type: String, required: function(this:any) { return this.provider === "credentials"; }},
+    bio:{ type: String },
+    image:{ type: String },
     location:{ type: String},
     portfolio:{ type: String },
     reputation:{ type: Number, default: 0 },
@@ -37,5 +37,3 @@ const UserSchema = new Schema({
 // this will allow us to use the IUser interface in the user model
 const User = models?.User || model<IUser>("User", UserSchema);
 export default User;
-
-

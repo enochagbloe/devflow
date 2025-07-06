@@ -6,6 +6,7 @@ import dbConnect from "@/lib/mongoose";
 import { signInWithOAuthSchema } from "@/lib/validation";
 import { APIErrorResponse } from "@/types/globals";
 import mongoose from "mongoose";
+import { NextResponse } from "next/server";
 import slugify from "slugify";
 
 export async function POST(request: Request) {
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
     // if the data is not valid
     if (!validation.success)
       throw new ValidationError(validation.error.flatten().fieldErrors);
-    
+
     // destruct the value about a user
     const { name, email, username, image } = user;
 
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
     }
     // commit your transaction
     await session.commitTransaction();
-
+    return NextResponse.json({ success: true});
     // No extra closing brace here
   } catch (error) {
     // rollback the changes made
