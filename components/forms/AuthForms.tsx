@@ -55,9 +55,9 @@ const AuthForm = <T extends FieldValues>({
           ? "Signed in successfully"
           : "Signed up successfully"
       );
-      if (result?.error?.massage === "User already exists") {
-        toast.success("An account with this email or username already exists");
-      }
+      if (result?.error?.massage === "Password does not match") {
+       toast.success("Password does not match");
+     }
       router.push(ROUTES.HOME);
     } else {
       toast.error(

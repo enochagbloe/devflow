@@ -6,12 +6,11 @@ import mongoose from "mongoose";
 import { signIn } from "@/auth";
 import Account from "@/database/account.model";
 import User from "@/database/user.model";
-import { ActionResponse } from "@/types/globals";
+import { ActionResponse, ErrorResponse } from "@/types/globals";
 import action from "../handler/action";
 import handleError from "../handler/error";
 import { NotFoundError } from "../http.errors";
 import { SignInSchema, SignUpSchema } from "../validation";
-
 
 export async function signUpWithCredentials(
   params: AuthCredentials
@@ -19,7 +18,7 @@ export async function signUpWithCredentials(
   const validationResult = await action({ params, schema: SignUpSchema });
 
   if (validationResult instanceof Error) {
-    return handleError(validationResult) as ErrorResponse;
+    return handleError(validationResult) as unknown as ErrorResponse;
   }
 
   const { name, username, email, password } = validationResult.params!;
@@ -42,9 +41,19 @@ export async function signUpWithCredentials(
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    // for debug purposes
+    console.log("Hashed Password:", hashedPassword);
 
     const [newUser] = await User.create([{ username, name, email }], {
       session,
+    });
+    // for debug purposes
+    console.log("Saving Account with:", {
+      userId: newUser._id,
+      name,
+      username,
+      email,
+      password: hashedPassword,
     });
 
     await Account.create(
@@ -65,27 +74,32 @@ export async function signUpWithCredentials(
     await session.commitTransaction();
     committed = true;
 
-    await signIn("credentials", { email, password, redirect: false });
+   const result = await signIn("credentials", { email, password, redirect: false });
+   if(!result || result.error){
+      console.error("Sign in failed:", result?.error);
+      throw new Error(result?.error || "Sign in failed");
+   }
 
     return { success: true };
   } catch (error) {
-    if(!committed) {
-      await session.abortTransaction()
+    if (!committed) {
+      await session.abortTransaction();
     }
 
-    return handleError(error) as ErrorResponse;
+    return handleError(error) as unknown as ErrorResponse;
   } finally {
     await session.endSession();
   }
 }
 
+// Sign in with credentials function
 export async function signInWithCredentials(
   params: Pick<AuthCredentials, "email" | "password">
 ): Promise<ActionResponse> {
   const validationResult = await action({ params, schema: SignInSchema });
 
   if (validationResult instanceof Error) {
-    return handleError(validationResult) as ErrorResponse;
+    return handleError(validationResult) as unknown as ErrorResponse;
   }
 
   const { email, password } = validationResult.params!;
@@ -109,10 +123,18 @@ export async function signInWithCredentials(
 
     if (!passwordMatch) throw new Error("Password does not match");
 
-    await signIn("credentials", { email, password, redirect: false });
+    const signInResponse = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (signInResponse instanceof Error) {
+      return handleError(signInResponse) as unknown as ErrorResponse;
+    }
 
     return { success: true };
   } catch (error) {
-   return handleError(error) as ErrorResponse;
+    return handleError(error) as unknown as ErrorResponse;
   }
 }
