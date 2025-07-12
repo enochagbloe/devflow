@@ -26,7 +26,7 @@ interface Question {
 type ActionResponse<T = null> = {
   success: boolean;
   data?: T;
-  error: {
+  error?: {
     massage: string;
     details: Record<string, string[]>;
   };

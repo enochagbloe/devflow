@@ -13,7 +13,11 @@ type ActionOptions<T> = {
   authorize?: boolean;
 };
 
-async function action<T>({ params, schema, authorize }: ActionOptions<T>) {
+async function action<T>({
+  params,
+  schema,
+  authorize = false,
+}: ActionOptions<T>) {
   // if we have access to the params and the schema
   if (params && schema) {
     // try and catch the schema
@@ -28,7 +32,7 @@ async function action<T>({ params, schema, authorize }: ActionOptions<T>) {
       }
     }
   }
-  // generate a new session so this is either a next auth session or null 
+  // generate a new session so this is either a next auth session or null
   let session: Session | null = null;
   // check if auth is true
   if (authorize) {
@@ -37,13 +41,14 @@ async function action<T>({ params, schema, authorize }: ActionOptions<T>) {
   }
 
   // if not authorized session return an unauthorized error
-  if(!session) return new UnauthorizedError();
+  if (authorize && !session) return new UnauthorizedError();
 
+ 
   // connect to database
   await dbConnect();
 
   // return the session and the params
-  return {session, params};
+  return { session, params };
 }
 
 // what are we doing here

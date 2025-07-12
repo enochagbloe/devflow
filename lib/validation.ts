@@ -69,19 +69,24 @@ export const AskQuestionShema = z.object({
 
 export const UserSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
-  username: z.string().min(3, { message: "Username must be at least 3 characters long." }),
+  username: z
+    .string()
+    .min(3, { message: "Username must be at least 3 characters long." }),
   email: z.string().email({ message: "Please provide a valid email address." }),
   bio: z.string().optional(),
-  Image: z.string().url({ message: "Please provide a valid image URL." }).optional(),
+  image: z.string().url({ message: "Please provide a valid URL." }).optional(),
   location: z.string().optional(),
-  portfolio: z.string().url({ message: "Please provide a valid portfolio URL." }).optional(),
+  portfolio: z
+    .string()
+    .url({ message: "Please provide a valid URL." })
+    .optional(),
   reputation: z.number().optional(),
 });
 
 export const AccountSchema = z.object({
-  userId: z.string(),
-  name: z.string().min(1, "Name is required"),
-  image: z.string().url("Invalid image URL").optional(),
+ userId: z.string().min(1, { message: "User ID is required." }),
+  name: z.string().min(1, { message: "Name is required." }),
+  image: z.string().url({ message: "Please provide a valid URL." }).optional(),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters long." })
@@ -97,8 +102,10 @@ export const AccountSchema = z.object({
       message: "Password must contain at least one special character.",
     })
     .optional(),
-  provider: z.string().min(1, "Provider is required"),
-  providerAccountId: z.string().min(1, "Provider account ID is required"),
+  provider: z.string().min(1, { message: "Provider is required." }),
+  providerAccountId: z
+    .string()
+    .min(1, { message: "Provider Account ID is required." }),
 });
 
 export const signInWithOAuthSchema = z.object({

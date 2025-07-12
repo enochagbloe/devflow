@@ -1,12 +1,56 @@
 import NextAuth from "next-auth"
-import github from "next-auth/providers/github"
-import google from "next-auth/providers/google"
+import Github from "next-auth/providers/github"
+import Google from "next-auth/providers/google"
 import { api } from "./lib/api"
 import { ActionResponse } from "./types/globals"
 import {  IAccountDoc } from "./database/account.model"
+import { SignInSchema } from "./lib/validation"
+import { IUserDoc } from "./database/user.model"
+import bcrypt from "bcryptjs"
+import Credentials from "next-auth/providers/credentials"
 // Configure NextAuth with your GitHub app credentials
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [github, google],
+  providers: [Github, Google, 
+    Credentials({
+    async authorize(credentials) {
+      //validate your data
+        const validatedFields = SignInSchema.safeParse(credentials);
+        // if the validation is successful
+        // Destructure the emails and password from the validated fields
+        if (validatedFields.success) {
+          const { email, password } = validatedFields.data;
+          // get the account api by email as ActionResponse<IAccountDoc>
+          const { data: existingAccount } = (await api.accounts.getByProvider(
+            email
+          )) as ActionResponse<IAccountDoc>;
+          // if the existingaccount is not found return null
+          if (!existingAccount) return null;
+          
+          const { data: existingUser } = (await api.users.getById(
+            existingAccount.userId.toString()
+          )) as ActionResponse<IUserDoc>;
+
+          if (!existingUser) return null;
+
+          const isValidPassword = await bcrypt.compare(
+            password,
+            existingAccount.password!
+          );
+
+          if (isValidPassword) {
+            return {
+              id: existingUser.id,
+              name: existingUser.name,
+              email: existingUser.email,
+              image: existingUser.image,
+            };
+          }
+        }
+        return null;
+      },
+  }) 
+  ],
+
   // add your callbacks
   callbacks: {
     // callback for sessions

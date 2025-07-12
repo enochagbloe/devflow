@@ -20,18 +20,19 @@ export async function POST(request: Request) {
   session.startTransaction();
 
   try {
+    // destruct the value about a user
+    const { name, email, username, image } = user;
+
     // validate the data
     const validation = signInWithOAuthSchema.safeParse({
       provider,
       providerAccountId,
       user,
+      email,
     });
     // if the data is not valid
     if (!validation.success)
       throw new ValidationError(validation.error.flatten().fieldErrors);
-
-    // destruct the value about a user
-    const { name, email, username, image } = user;
 
     const slugifiedUsername = slugify(username, {
       lower: true,
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
             image,
             provider,
             providerAccountId,
+            email,
           },
         ],
         { session }
