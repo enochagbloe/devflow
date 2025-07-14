@@ -7,7 +7,7 @@ import React from "react";
 interface Props {
   id: string;
   name: string;
-  imageUrl?: string;
+  imageUrl?: string; // optional image URL
   className?: string; // optional className for styling
 }
 // accept all the props

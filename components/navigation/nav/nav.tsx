@@ -29,9 +29,9 @@ const Navbar = async () => {
         {userId && (
           <UserAvata 
           //write in your props
-          id={session?.user?.id}
+          id={session?.user?.id!}
           name={session?.user?.name!}
-          imageUrl={session?.user?.image}/>
+          imageUrl={session?.user?.image!}/>
         )}
         <MobileNavigation />
       </div>
