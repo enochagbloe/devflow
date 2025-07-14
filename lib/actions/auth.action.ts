@@ -74,11 +74,15 @@ export async function signUpWithCredentials(
     await session.commitTransaction();
     committed = true;
 
-   const result = await signIn("credentials", { email, password, redirect: false });
-   if(!result || result.error){
-      console.error("Sign in failed:", result?.error);
-      throw new Error(result?.error || "Sign in failed");
-   }
+    // const result = await signIn("credentials", {
+    //   email,
+    //   password,
+    //   redirect: false,
+    // });
+    // if (!result || result.error) {
+    //   console.error("Sign in failed:", result?.error);
+    //   throw new Error(result?.error || "Sign in failed");
+    // }
 
     return { success: true };
   } catch (error) {
