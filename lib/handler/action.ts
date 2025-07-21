@@ -22,6 +22,8 @@ async function action<T>({
   if (params && schema) {
     // try and catch the schema
     try {
+      // validate the schema
+      schema.parse(params);
     } catch (error) {
       if (error instanceof ZodError) {
         return new ValidationError(
@@ -38,17 +40,16 @@ async function action<T>({
   if (authorize) {
     // get the session
     session = await auth();
+
+    // if not authorized session return an unauthorized error
+    if (!session) return new UnauthorizedError();
   }
 
-  // if not authorized session return an unauthorized error
-  if (authorize && !session) return new UnauthorizedError();
-
- 
   // connect to database
   await dbConnect();
 
   // return the session and the params
-  return { session, params };
+  return { params, session };
 }
 
 // what are we doing here

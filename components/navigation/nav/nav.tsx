@@ -4,12 +4,11 @@ import Image from "next/image";
 import Theme from "./theme";
 import MobileNavigation from "./MobileNavigation"; // Adjust the path as needed
 import { auth } from "@/auth"; // Adjust the path as needed
-import UserAvata from "@/components/ui/UserAvata";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 const Navbar = async () => {
   // get the user session here if needed
   const session = await auth();
-  const userId = session?.user?.id;
   return (
     <nav className="flex-between background-light900_dark200 fixed z-50 w-full gap-5 p-6 shadow-light-300 dark:shadow-none sm:px-12 ">
       <Link href="/" className="flex items-center gap-1">
@@ -26,12 +25,12 @@ const Navbar = async () => {
       <p>Global search</p>
       <div className="flex-between flex gap-5">
         <Theme />
-        {userId && (
-          <UserAvata 
-          //write in your props
-          id={session?.user?.id!}
-          name={session?.user?.name!}
-          imageUrl={session?.user?.image!}/>
+        {session?.user && (
+          <UserAvatar
+            name={session.user.name!}
+            id={session.user.id}
+            imageUrl={session.user?.image}
+          />
         )}
         <MobileNavigation />
       </div>

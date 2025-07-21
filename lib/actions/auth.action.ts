@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import { signIn } from "@/auth";
 import Account from "@/database/account.model";
 import User from "@/database/user.model";
-import { ActionResponse, ErrorResponse } from "@/types/globals";
+import { ActionResponse } from "@/types/global";
 import action from "../handler/action";
 import handleError from "../handler/error";
 import { NotFoundError } from "../http.errors";
@@ -18,7 +18,7 @@ export async function signUpWithCredentials(
   const validationResult = await action({ params, schema: SignUpSchema });
 
   if (validationResult instanceof Error) {
-    return handleError(validationResult) as unknown as ErrorResponse;
+    return handleError(validationResult) as ErrorResponse;
   }
 
   const { name, username, email, password } = validationResult.params!;
@@ -26,7 +26,7 @@ export async function signUpWithCredentials(
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  let committed = false;
+  //let committed = false;
   try {
     const existingUser = await User.findOne({ email }).session(session);
 
@@ -47,14 +47,6 @@ export async function signUpWithCredentials(
     const [newUser] = await User.create([{ username, name, email }], {
       session,
     });
-    // for debug purposes
-    console.log("Saving Account with:", {
-      userId: newUser._id,
-      name,
-      username,
-      email,
-      password: hashedPassword,
-    });
 
     await Account.create(
       [
@@ -72,25 +64,19 @@ export async function signUpWithCredentials(
     );
 
     await session.commitTransaction();
-    committed = true;
 
-    // const result = await signIn("credentials", {
+    // automatically sign in the user after successful registration
+    // await signIn("credentials", {
     //   email,
     //   password,
     //   redirect: false,
     // });
-    // if (!result || result.error) {
-    //   console.error("Sign in failed:", result?.error);
-    //   throw new Error(result?.error || "Sign in failed");
-    // }
-
+    
     return { success: true };
   } catch (error) {
-    if (!committed) {
-      await session.abortTransaction();
-    }
-
-    return handleError(error) as unknown as ErrorResponse;
+    await session.abortTransaction();
+    
+    return handleError(error) as ErrorResponse;
   } finally {
     await session.endSession();
   }
@@ -103,42 +89,42 @@ export async function signInWithCredentials(
   const validationResult = await action({ params, schema: SignInSchema });
 
   if (validationResult instanceof Error) {
-    return handleError(validationResult) as unknown as ErrorResponse;
+    return handleError(validationResult)  as ErrorResponse;
   }
 
   const { email, password } = validationResult.params!;
 
   try {
-    const existingUser = await User.findOne({ email });
+    // const existingUser = await User.findOne({ email });
 
-    if (!existingUser) throw new NotFoundError("User");
+    // if (!existingUser) throw new NotFoundError("User");
 
-    const existingAccount = await Account.findOne({
-      provider: "credentials",
-      providerAccountId: email,
-    });
+    // const existingAccount = await Account.findOne({
+    //   provider: "credentials",
+    //   providerAccountId: email,
+    // });
 
-    if (!existingAccount) throw new NotFoundError("Account");
+    // if (!existingAccount) throw new NotFoundError("Account");
 
-    const passwordMatch = await bcrypt.compare(
-      password,
-      existingAccount.password
-    );
+    // const passwordMatch = await bcrypt.compare(
+    //   password,
+    //   existingAccount.password
+    // );
 
-    if (!passwordMatch) throw new Error("Password does not match");
+    // if (!passwordMatch) throw new Error("Password does not match");
 
-    const signInResponse = await signIn("credentials", {
+   const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
 
-    if (signInResponse instanceof Error) {
-      return handleError(signInResponse) as unknown as ErrorResponse;
+    if (result.error) {
+      throw new Error("Invalid credentials");
     }
 
     return { success: true };
   } catch (error) {
-    return handleError(error) as unknown as ErrorResponse;
+    return handleError(error) as ErrorResponse;
   }
 }

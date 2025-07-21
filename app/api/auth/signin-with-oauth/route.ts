@@ -4,7 +4,7 @@ import handleError from "@/lib/handler/error";
 import { ValidationError } from "@/lib/http.errors";
 import dbConnect from "@/lib/mongoose";
 import { signInWithOAuthSchema } from "@/lib/validation";
-import { APIErrorResponse } from "@/types/globals";
+import { APIErrorResponse } from "@/types/global";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import slugify from "slugify";
@@ -12,6 +12,7 @@ import slugify from "slugify";
 export async function POST(request: Request) {
   // extract the from the json the params needed
   const { provider, providerAccountId, user } = await request.json();
+
   // connect to the database
   await dbConnect();
 
@@ -20,20 +21,25 @@ export async function POST(request: Request) {
   session.startTransaction();
 
   try {
-    // destruct the value about a user
-    const { name, email, username, image } = user;
+    // for debugging purpose
+    // const body = await request.json();
+    // console.log("Request body:", body);
 
     // validate the data
-    const validation = signInWithOAuthSchema.safeParse({
+    const validationData = signInWithOAuthSchema.safeParse({
       provider,
       providerAccountId,
       user,
-      email,
     });
-    // if the data is not valid
-    if (!validation.success)
-      throw new ValidationError(validation.error.flatten().fieldErrors);
 
+    // if the data is not valid
+    if (!validationData.success)
+      throw new ValidationError(validationData.error.flatten().fieldErrors);
+
+    // destruct the value about a user
+    const { name, email, username, image } = user;
+
+    // slugify the username
     const slugifiedUsername = slugify(username, {
       lower: true,
       strict: true,
@@ -45,7 +51,7 @@ export async function POST(request: Request) {
     // check if there is no existing user
     if (!existingUser) {
       // create a new user
-       [existingUser] = await User.create(
+      [existingUser] = await User.create(
         [{ name, username: slugifiedUsername, email, image }],
         { session }
       );
@@ -55,31 +61,33 @@ export async function POST(request: Request) {
       if (existingUser.name !== name) updatedData.name = name;
       if (existingUser.image !== image) updatedData.image = image;
       // update the user
-      if (Object.keys(updatedData).length > 0)
+      if (Object.keys(updatedData).length > 0) {
         await User.updateOne(
           { _id: existingUser._id },
           { $set: updatedData }
         ).session(session);
+      }
     }
     // find the account of the user
     const existingAccount = await Account.findOne({
-        userId: existingUser._id,
-        provider,
-        providerAccountId,
-    }).session(session)
+      userId: existingUser._id,
+      provider,
+      providerAccountId,
+    }).session(session);
 
     // if the account does not exits
-    if(!existingAccount){
+    if (!existingAccount) {
       // create a new account
       await Account.create(
         [
           {
             userId: existingUser._id,
-            name,
+            username: slugifiedUsername,
+            email,
             image,
+            name,
             provider,
             providerAccountId,
-            email,
           },
         ],
         { session }
@@ -87,9 +95,9 @@ export async function POST(request: Request) {
     }
     // commit your transaction
     await session.commitTransaction();
-    return NextResponse.json({ success: true});
+    return NextResponse.json({ success: true });
     // No extra closing brace here
-  } catch (error) {
+  } catch (error: unknown) {
     // rollback the changes made
     await session.abortTransaction();
     return handleError(error, "api") as APIErrorResponse;

@@ -3,7 +3,7 @@ import handleError from "@/lib/handler/error";
 import { NotFoundError } from "@/lib/http.errors";
 import dbConnect from "@/lib/mongoose";
 import { UserSchema } from "@/lib/validation";
-import { APIErrorResponse } from "@/types/globals";
+import { APIErrorResponse } from "@/types/global";
 import { NextResponse } from "next/server";
 
 // GET
@@ -16,7 +16,7 @@ export async function GET(
   // if the id don't exist throw new NotFoundError()
   if (!id) throw new NotFoundError("User");
 
-  // if you have a an UserId [use a try and catch block]
+  // if you have a UserId [use a try and catch block]
 
   try {
     await dbConnect(); // connect to the database
@@ -26,7 +26,7 @@ export async function GET(
     if (!user) throw new NotFoundError("User");
 
     // if we have a user
-    return NextResponse.json({ success: true, data: User });
+    return NextResponse.json({ success: true, data: User }, {status: 200});
   } catch (error) {
     return handleError(error, "api") as APIErrorResponse;
   }
@@ -70,11 +70,11 @@ export async function PUT(
   // if there is an available connect to the database and find the user
   try {
     // connect to database
-    await dbConnect()
+    await dbConnect();
 
     // validate the data
     const body = await _.json();
-    const validatedData = UserSchema.partial(body);
+    const validatedData = UserSchema.partial().parse(body);
     // find the user
     const updatedUser = await User.findByIdAndUpdate(id, validatedData, {
       new: true,
@@ -82,7 +82,10 @@ export async function PUT(
     // if there is no user throw an error
     if (!updatedUser) throw new NotFoundError("User");
     // if the user successfully updated
-    return NextResponse.json({ success: true, data: updatedUser }, { status: 200 });
+    return NextResponse.json(
+      { success: true, data: updatedUser },
+      { status: 200 }
+    );
   } catch (error) {
     return handleError(error, "api") as APIErrorResponse;
   }

@@ -1,7 +1,7 @@
 "use client";
 import { AskQuestionShema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useRef } from "react";
+import React, {  useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -17,13 +17,22 @@ import { Button } from "../ui/button";
 import { MDXEditorMethods } from "@mdxeditor/editor";
 import dynamic from "next/dynamic";
 import { z } from "zod";
-// import { Key, Tag } from "lucide-react";
+import { LoaderIcon } from "lucide-react";
 import TagCard from "../card/TagCard";
+import { createQuestion } from "@/lib/actions/question.action";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import ROUTES from "@/constants/routes";
+
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
+
+
 const QuestionForm = () => {
+  const Router = useRouter();
+  const [isPending, startTransition] = useTransition();
   // use ref for the Editor
   const Ref = useRef<MDXEditorMethods>(null);
   // specify the question form validation here
@@ -76,12 +85,26 @@ const QuestionForm = () => {
   };
 
   const removeTags = (tag: string, field: { value: string[] }) => {
-    const removeTags= field.value.filter((t) => t !== tag);
+    const removeTags = field.value.filter((t) => t !== tag);
     form.setValue("tags", removeTags);
-  }
-  const handleCreateQuestion = (data: z.infer<typeof AskQuestionShema>) => {
-    console.log("Form Data:", data);
-    // Here you can handle the form submission, e.g., send data to an API
+  };
+  const handleCreateQuestion = async (
+    data: z.infer<typeof AskQuestionShema>
+  ) => {
+    startTransition(async () => {
+      const result = await createQuestion(data);
+      // notify the user if the user has successfully created a question
+      if (result.success) {
+        toast.success("Question created successfully!");
+
+        // redirect to the question page if the question is created successfully
+      if (result.data) Router.push(ROUTES.QUESTION(result.data?._id));
+      }
+      else {
+        toast.error("Failed to create question");
+      }
+      console.log("Form Data:", data);
+    });
   };
 
   return (
@@ -110,7 +133,7 @@ const QuestionForm = () => {
                 {" "}
                 please be specific in your question
               </FormDescription>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -158,9 +181,19 @@ const QuestionForm = () => {
                       onKeyDown={(e) => handleInputKeyDown(e, field)}
                     />
                     {field.value.length > 0 && (
-                      <div className="flex-start gap-3 mt-3.4 flex-wrap">{field?.value?.map((tag: string) => 
-                      <TagCard _id={tag} key={tag} name={tag} compact 
-                      isButton remove handleRemove= {(e)=> removeTags(tag, field)} />)}</div>
+                      <div className="flex-start gap-3 mt-3.4 flex-wrap">
+                        {field?.value?.map((tag: string) => (
+                          <TagCard
+                            _id={tag}
+                            key={tag}
+                            name={tag}
+                            compact
+                            isButton
+                            remove
+                            handleRemove={(e) => removeTags(tag, field)}
+                          />
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -174,9 +207,17 @@ const QuestionForm = () => {
         <div className="m-t-16 flex justify-end">
           <Button
             type="submit"
+            disabled={isPending}
             className="primary-gradient justify-end !text-white-900"
           >
-            Ask question
+            {isPending ? (
+              <>
+                <LoaderIcon className="mr-2 animate-spin" />
+                <span>submitting</span>
+              </>
+            ) : (
+              <>AskQuestion</>
+            )}
           </Button>
         </div>
       </form>

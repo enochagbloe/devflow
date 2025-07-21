@@ -3,7 +3,7 @@ import handleError from "@/lib/handler/error";
 import { NotFoundError, ValidationError } from "@/lib/http.errors";
 import dbConnect from "@/lib/mongoose";
 import { AccountSchema } from "@/lib/validation";
-import { APIErrorResponse } from "@/types/globals";
+import { APIErrorResponse } from "@/types/global";
 import { NextResponse } from "next/server";
 
 // GET
@@ -23,10 +23,10 @@ export async function GET(
     // when connected extract the account
     const account = await Account.findById(id);
     // if you don't have a account
-    if (!account) throw new NotFoundError("User");
+    if (!account) throw new NotFoundError("Account");
 
     // if we have a account
-    return NextResponse.json({ success: true, data: account });
+    return NextResponse.json({ success: true, data: account }, { status: 200 });
   } catch (error) {
     return handleError(error, "api") as APIErrorResponse;
   }
@@ -70,7 +70,7 @@ export async function PUT(
   // if there is an available connect to the database and find the account
   try {
     // connect to database
-    await dbConnect()
+    await dbConnect();
 
     // validate the data
     const body = await _.json();
@@ -86,7 +86,10 @@ export async function PUT(
     // if there is no account throw an error
     if (!updatedAccount) throw new NotFoundError("Account");
     // if the account successfully updated
-    return NextResponse.json({ success: true, data: updatedAccount }, { status: 200 });
+    return NextResponse.json(
+      { success: true, data: updatedAccount },
+      { status: 200 }
+    );
   } catch (error) {
     return handleError(error, "api") as APIErrorResponse;
   }

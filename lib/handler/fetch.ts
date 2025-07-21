@@ -1,7 +1,7 @@
 import logger from "../logger";
 import handleError from "./error";
 import { RequestError } from "../http.errors";
-import { ActionResponse } from "@/types/globals";
+import { ActionResponse } from "@/types/global";
 
 interface FetchOptions extends RequestInit {
   timeout?: number;
@@ -17,7 +17,7 @@ export async function fetchHandler<T>(
 ): Promise<ActionResponse<T>> {
   // destructure the timeout, headers and spread the rest of the options from the options
   const {
-    timeout = 5000,
+    timeout = 1000000,
     headers: customHeaders = {},
     ...restOptions
   } = options;

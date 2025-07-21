@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import ROUTES from "@/constants/routes";
-import { ActionResponse } from "@/types/globals";
+import { ActionResponse } from "@/types/global";
 import toast from "react-hot-toast";
 
 interface AuthFormProps<T extends FieldValues> {
@@ -55,14 +55,8 @@ const AuthForm = <T extends FieldValues>({
           ? "Signed in successfully"
           : "Signed up successfully"
       );
-      if (result?.error?.massage === "Password does not match") {
-       toast.success("Password does not match");
-     }
+      // Redirect to home page after successful sign in or sign up
       router.push(ROUTES.HOME);
-    } else {
-      toast.error(
-        `Error ${result?.status}: ${result?.error?.massage ?? "An error occurred"}`
-      );
     }
   };
 
