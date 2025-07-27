@@ -1,4 +1,4 @@
-import { array, z } from "zod";
+import { z } from "zod";
 
 export const SignInSchema = z.object({
   email: z
@@ -67,6 +67,14 @@ export const AskQuestionShema = z.object({
     .max(5, { message: "Maximum of 5 tags allowed." }),
 });
 
+export const EditQuestionSchema = AskQuestionShema.extend({
+  questionId: z.string().min(1, { message: "Question ID is required." }),
+})
+
+export const GetQuestionSchema = z.object({
+  questionId: z.string().min(1, { message: "Question ID is required." }),
+})
+
 export const UserSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
   username: z
@@ -118,3 +126,4 @@ export const signInWithOAuthSchema = z.object({
     image: z.string().url('Invalid image URL.').optional(),
   })
 });
+

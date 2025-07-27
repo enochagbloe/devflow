@@ -9,20 +9,6 @@ interface SignInWithOAuthParams {
   };
 }
 
-// type ErrorResponds = {
-//   message: string;
-//   errors: Record<string, string[]>;
-// };
-// type ActionResponse<T = null> = {
-//   success: boolean;
-//   data?: T;
-//   error?: {
-//     massage: string;
-//     details: Record<string, string[]>;
-//   };
-//   status?: number;
-// };
-
 type ErrorResponse = ActionResponse<undefined> & {
   success: false;
 };
@@ -41,4 +27,12 @@ interface CreateQuestionParams{
     title: string;
     tags: string[];
     content: string;
+}
+
+interface EditQuestionParams extends CreateQuestionParams{
+    questionId: string
+}
+
+interface GetQuestionParams{
+    questionId: string
 }

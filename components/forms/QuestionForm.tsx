@@ -1,7 +1,7 @@
 "use client";
 import { AskQuestionShema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, {  useRef, useTransition } from "react";
+import React, { useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -19,29 +19,35 @@ import dynamic from "next/dynamic";
 import { z } from "zod";
 import { LoaderIcon } from "lucide-react";
 import TagCard from "../card/TagCard";
-import { createQuestion } from "@/lib/actions/question.action";
+import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import ROUTES from "@/constants/routes";
-
+import { Question } from "@/types/global";
 
 const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
 
+interface Params {
+  question?: Question;
+  isEdit?: boolean;
+}
 
-const QuestionForm = () => {
+const QuestionForm = ({ question, isEdit = false }: Params) => {
   const Router = useRouter();
   const [isPending, startTransition] = useTransition();
   // use ref for the Editor
   const Ref = useRef<MDXEditorMethods>(null);
+
   // specify the question form validation here
   const form = useForm<z.infer<typeof AskQuestionShema>>({
     resolver: zodResolver(AskQuestionShema),
     defaultValues: {
-      content: "",
-      title: "",
-      tags: [],
+      // set the default values
+      title: question?.title || "",
+      content: question?.content || "",
+      tags: question?.tags?.map((tag) => tag.name) || [],
     },
   });
 
@@ -50,7 +56,7 @@ const QuestionForm = () => {
     e: React.KeyboardEvent<HTMLInputElement>,
     field: { value: string[] }
   ) => {
-    // what happens when thee input key is pressed
+    // what happens when the input key is pressed
     if (e.key === "Enter") {
       e.preventDefault();
       // get the input value and trim it
@@ -60,50 +66,75 @@ const QuestionForm = () => {
       if (
         inputTag &&
         inputTag.length <= 15 &&
-        !field.value.includes(inputTag)
+        !field.value.some((tag) => tag.toLowerCase() === inputTag.toLowerCase())
       ) {
         form.setValue("tags", [...field.value, inputTag]);
         form.clearErrors("tags");
         e.currentTarget.value = "";
       } else if (inputTag.length > 15) {
-        alert("Tag cannot exceed 15 characters.");
         form.setError("tags", {
           type: "manual",
           message: "Tag cannot exceed 15 characters.",
         });
-        // Tag already exists
-      } else if (field.value.includes(inputTag)) {
+      } else if (
+        field.value.some((tag) => tag.toLowerCase() === inputTag.toLowerCase())
+      ) {
         form.setError("tags", {
           type: "manual",
           message: "Tag already exists.",
         });
       }
-      e.currentTarget.value = "";
+
+      // Clear input if there's an error
+      if (
+        inputTag.length > 15 ||
+        field.value.some((tag) => tag.toLowerCase() === inputTag.toLowerCase())
+      ) {
+        e.currentTarget.value = "";
+      }
     }
-    // log the current tags and input tag
-    console.log("Current Tags:", field.value);
   };
 
   const removeTags = (tag: string, field: { value: string[] }) => {
     const removeTags = field.value.filter((t) => t !== tag);
     form.setValue("tags", removeTags);
   };
+
   const handleCreateQuestion = async (
     data: z.infer<typeof AskQuestionShema>
   ) => {
     startTransition(async () => {
+      if (isEdit && question && question._id) {
+        const result = await editQuestion({
+          questionId: question?._id,
+          ...data,
+        });
+
+        if (result.success) {
+          toast.success("Question updated successfully!");
+          // Type assertion as temporary fix
+          if (result.data && "_id" in result.data) {
+            Router.push(ROUTES.QUESTION((result.data as any)._id));
+          }
+        } else {
+          toast.error("Failed to update question");
+        }
+
+        return;
+      }
+
       const result = await createQuestion(data);
-      // notify the user if the user has successfully created a question
+      // redirect the user if the user has successfully created a question
       if (result.success) {
         toast.success("Question created successfully!");
-
         // redirect to the question page if the question is created successfully
-      if (result.data) Router.push(ROUTES.QUESTION(result.data?._id));
-      }
-      else {
+        // Type assertion as temporary fix
+       if (result.data && "_id" in result.data) {
+            Router.push(ROUTES.QUESTION((result.data as any)._id));
+          }
+      } else {
         toast.error("Failed to create question");
       }
-      console.log("Form Data:", data);
     });
   };
 
@@ -111,7 +142,7 @@ const QuestionForm = () => {
     //validate the form
     <Form {...form}>
       <form
-        className="w-full flex-col gap-10 pb-10"
+        className="w-full flex flex-col gap-10 pb-10"
         onSubmit={form.handleSubmit(handleCreateQuestion)}
       >
         {/* contains the form fields */}
@@ -121,7 +152,7 @@ const QuestionForm = () => {
           render={({ field }) => (
             <FormItem className="flex w-full flex-col gap-3">
               <FormLabel className="paragraph-semibold text-dark300_light700">
-                Questions title <span className="text-primary-500">*</span>
+                Question title <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl>
                 <Input
@@ -130,8 +161,7 @@ const QuestionForm = () => {
                 />
               </FormControl>
               <FormDescription className="mt-2.5 pb-5">
-                {" "}
-                please be specific in your question
+                Please be specific in your question
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -155,8 +185,7 @@ const QuestionForm = () => {
                 />
               </FormControl>
               <FormDescription className="mt-2.5 pb-5">
-                {" "}
-                please be specific in your question
+                Please provide a detailed explanation of your question
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -169,42 +198,39 @@ const QuestionForm = () => {
           render={({ field }) => (
             <FormItem className="flex w-full flex-col gap-3">
               <FormLabel className="paragraph-semibold text-dark300_light700">
-                Questions title <span className="text-primary-500">*</span>
+                Tags <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl>
                 <div>
-                  {" "}
-                  <div>
-                    <Input
-                      className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] rounded-md border focus:outline-none"
-                      placeholder="Add tags..."
-                      onKeyDown={(e) => handleInputKeyDown(e, field)}
-                    />
-                    {field.value.length > 0 && (
-                      <div className="flex-start gap-3 mt-3.4 flex-wrap">
-                        {field?.value?.map((tag: string) => (
-                          <TagCard
-                            _id={tag}
-                            key={tag}
-                            name={tag}
-                            compact
-                            isButton
-                            remove
-                            handleRemove={(e) => removeTags(tag, field)}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <Input
+                    className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] rounded-md border focus:outline-none"
+                    placeholder="Add tags..."
+                    onKeyDown={(e) => handleInputKeyDown(e, field)}
+                  />
+                  {field.value.length > 0 && (
+                    <div className="flex flex-start gap-3 mt-3 flex-wrap">
+                      {field?.value?.map((tag: string) => (
+                        <TagCard
+                          _id={tag}
+                          key={tag}
+                          name={tag}
+                          compact
+                          isButton
+                          remove
+                          handleRemove={(e) => removeTags(tag, field)}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </FormControl>
-              <FormDescription> </FormDescription>
-              Add up to 3 tags
+              <FormDescription>Add up to 3 tags</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="m-t-16 flex justify-end">
+
+        <div className="mt-16 flex justify-end">
           <Button
             type="submit"
             disabled={isPending}
@@ -212,11 +238,11 @@ const QuestionForm = () => {
           >
             {isPending ? (
               <>
-                <LoaderIcon className="mr-2 animate-spin" />
-                <span>submitting</span>
+                <LoaderIcon className="mr-2 size-4 animate-spin" />
+                <span>Submitting...</span>
               </>
             ) : (
-              <>AskQuestion</>
+              <>{isEdit ? "Edit Question" : "Ask a Question"}</>
             )}
           </Button>
         </div>

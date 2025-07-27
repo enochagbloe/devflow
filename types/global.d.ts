@@ -12,15 +12,16 @@ interface author {
   value: string;
 }
 interface Question {
-  _id: string;
+   _id: string;
   title: string;
-  // description: string;
+  content: string;
   tags: Tag[];
-  author: author;
+  author: Author;
   createdAt: Date;
   upvotes: number;
-  views: number;
+  downvotes: number;
   answers: number;
+  views: number;
 }
 
 type ActionResponse<T = null> = {
