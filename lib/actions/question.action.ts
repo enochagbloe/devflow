@@ -8,10 +8,10 @@ import {
 } from "../validation";
 import action from "../handler/action";
 import mongoose from "mongoose";
-import Question, { IQuestionDoc } from "@/database/question.model";
+// Import models from centralized database index to ensure they're all registered
+import { Question, Tag, TagQuestion, User } from "@/database";
+import { IQuestionDoc } from "@/database/question.model";
 import { ActionResponse } from "@/types/global";
-import Tag from "@/database/tag.model";
-import TagQuestion from "@/database/tag-question.model";
 import handleError from "../handler/error";
 import { ITagDoc } from "@/database/tag.model";
 
@@ -51,12 +51,14 @@ export async function createQuestion(
 
     // STEP 2: Create the question with ObjectIds instead of strings
     const [question] = await Question.create(
-      [{ 
-        title, 
-        content, 
-        author: userId, 
-        tags: tagIds // ✅ Use ObjectIds here, not the original string tags
-      }],
+      [
+        {
+          title,
+          content,
+          author: userId,
+          tags: tagIds, // ✅ Use ObjectIds here, not the original string tags
+        },
+      ],
       { session }
     );
 
@@ -83,7 +85,6 @@ export async function createQuestion(
       success: true,
       data: JSON.parse(JSON.stringify(question)),
     };
-
   } catch (error) {
     await session.abortTransaction();
     return handleError(error) as ErrorResponse;
@@ -210,30 +211,47 @@ export async function editQuestion(
 export async function getQuestion(
   params: GetQuestionParams
 ): Promise<ActionResponse<typeof Question>> {
+  console.log("🔍 getQuestion called with params:", params);
+
   // validate the data
   const validationResult = await action({
     params,
     schema: GetQuestionSchema,
-    authorize: true,
+    authorize: false,
   });
+
+  console.log("🔍 Validation result:", validationResult);
+
   // handle the validation data
   if (validationResult instanceof Error) {
+    console.log("❌ Validation failed:", validationResult.message);
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { questionId } = validationResult.params!; // ✅ Added questionId
-  // get the userId
-  // const userId = validationResult.session?.user?.id;
+  const { questionId } = validationResult.params!;
+  console.log("🔍 Looking for question with ID:", questionId);
+
   try {
-    const question = await Question.findById(questionId)
-      .populate("tags", "_id name")
-      .populate("author", "_id name image");
+    console.log("🔍 About to query database...");
+
+    // Try without populate first to test basic functionality
+    const question = await Question.findById(questionId).populate("tags", "_id name").populate("author", "_id name image");
+    // console.log(
+    //   "🔍 Simple query completed. Found question:",
+    //   question ? "Yes" : "No"
+    // );
+
     if (!question) throw new Error("Question not found");
+
+    console.log("🔍 Question title:", question.title);
+    console.log("🔍 Question author ID (raw):", question.author);
+
     return {
       success: true,
       data: JSON.parse(JSON.stringify(question)),
     };
   } catch (error) {
+    console.log("❌ Error in getQuestion:", error);
     return handleError(error) as ErrorResponse;
   }
 }

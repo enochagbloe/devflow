@@ -27,7 +27,11 @@ const TagCard = ({
   handleRemove,
   isButton,
 }: Props) => {
-  const iconClass = getDeviconClassName(name);
+  const iconClass = name
+    ? getDeviconClassName(name)
+    : "devicon-devicon-plain colored";
+
+  const displayName = name || "Unknown Tag";
 
   const linkContent = (
     <>
@@ -37,14 +41,20 @@ const TagCard = ({
           <span>{name}</span>
         </div>
         {remove && (
-          <Image
-            src="/icons/close.svg"
-            alt="remove tag"
-            width={16}
-            height={16}
-            className="invert-0 hover: cursor-pointer dark:invert ml-2"
+          <button
+            type="button"
             onClick={handleRemove}
-          />
+            className="ml-2 p-0 bg-transparent border-none cursor-pointer"
+            aria-label="Remove tag"
+          >
+            <Image
+              src="/icons/close.svg"
+              alt="remove tag"
+              width={16}
+              height={16}
+              className="invert-0 hover: cursor-pointer dark:invert"
+            />
+          </button>
         )}
       </Badge>
 
@@ -66,6 +76,11 @@ const TagCard = ({
       </Link>
     );
   }
+  return (
+    <Link href={ROUTES.TAGS(_id)} className="flex justify-between gap-2">
+      {linkContent}
+    </Link>
+  );
 };
 
 export default TagCard;
