@@ -4,7 +4,7 @@ import Image from "next/image";
 import Theme from "./theme";
 import MobileNavigation from "./MobileNavigation"; // Adjust the path as needed
 import { auth } from "@/auth"; // Adjust the path as needed
-import UserAvatar from "@/components/ui/UserAvatar";
+import UserAvatar from "@/components/UserAvatar";
 
 const Navbar = async () => {
   // get the user session here if needed
