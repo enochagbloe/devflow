@@ -1,30 +1,31 @@
-import { models, Schema, model, Types } from "mongoose";
+import { model, models, Schema, Types, Document } from "mongoose";
 
 export interface IAccount {
-  userId: Types.ObjectId; // Reference to the User model
-  name: string;
+  userId: Types.ObjectId;
   email: string;
-  password: string;
-  username: string;
+  username?: string;
+  name: string;
   image?: string;
-  provider: string; // e.g., 'google', 'github', etc.
-  providerAccountId: string; // Unique ID from the provider
+  password?: string;
+  provider: string;
+  providerAccountId: string;
 }
-const AccountSchema = new Schema(
+
+export interface IAccountDoc extends IAccount, Document {}
+const AccountSchema = new Schema<IAccount>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    email: { type: String, required: true, unique: true, optional: true },
+    username: { type: String, required: true, unique: true, optional: true },
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
-    image: { type: String},
-    provider: { type: String, required: true }, // e.g., 'google', 'github', etc.
-    providerAccountId: { type: String, required: true }, // Unique ID from the provider
+    image: { type: String },
+    password: { type: String },
+    provider: { type: String, required: true },
+    providerAccountId: { type: String, required: true },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const Account = models?.Account || model<IAccount>("Account", AccountSchema);
+
 export default Account;
