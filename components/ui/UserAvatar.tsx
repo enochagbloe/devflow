@@ -5,7 +5,7 @@ import Image from "next/image";
 import React from "react";
 
 interface Props {
-  id: string;
+  id: string; // Make id required
   name: string;
   imageUrl?: string | null  // optional image URL
   className?: string; // optional className for styling
@@ -19,8 +19,7 @@ const UserAvatar = ({ id, name, imageUrl, className = "h-9 l-g" }: Props) => {
     .toUpperCase()
     .slice(0, 2);
   return (
-    <Link>
-      href={ROUTES.PROFILE(id)}
+    <Link href={ROUTES.PROFILE(id)}>
       <Avatar className={className}>
         {/* // if imageUrl is provided, use it as the avatar image */}
         {imageUrl ? (

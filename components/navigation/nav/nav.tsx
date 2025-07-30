@@ -25,7 +25,7 @@ const Navbar = async () => {
       <p>Global search</p>
       <div className="flex-between flex gap-5">
         <Theme />
-        {session?.user && (
+        {session?.user && session.user.id && (
           <UserAvatar
             name={session.user.name!}
             id={session.user.id}
