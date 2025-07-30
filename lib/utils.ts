@@ -15,7 +15,8 @@ export const getDeviconClassName = (techName: string)=>{
   return techMap[normalizedTechName]? `${techMap[normalizedTechName]} colored`: "devicon-devicon-plain";
 }
 
-export const getTimeStamp = (date: Date): string => {
+export const getTimeStamp = (createdAt: Date): string => {
+  const date = new Date(createdAt);
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

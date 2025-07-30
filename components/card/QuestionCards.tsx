@@ -6,6 +6,7 @@ import { getTimeStamp } from "@/lib/utils";
 
 import TagCard from "./TagCard";
 import Metric from "../Metric";
+import { Question, Tag } from "@/types/global";
 
 interface Props {
   question: Question;
@@ -19,9 +20,9 @@ const QuestionCard = ({
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
         <div>
           <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
-            {getTimeStamp(createdAt)}
+            {createdAt ? getTimeStamp(createdAt) : ''}
           </span>
-
+          {createdAt ? getTimeStamp(createdAt) : ''}
           <Link href={ROUTES.QUESTION(_id)}>
             <h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1">
               {title}
@@ -41,7 +42,7 @@ const QuestionCard = ({
           imgUrl={author.image}
           alt={author.name}
           value={author.name}
-          title={`• asked ${getTimeStamp(createdAt)}`}
+          title={`• asked ${createdAt ? getTimeStamp(createdAt) : ''}`}
           href={ROUTES.PROFILE(author._id)}
           textStyles="body-medium text-dark400_light700"
           isAuthor

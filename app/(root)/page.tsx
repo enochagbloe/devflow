@@ -4,80 +4,9 @@ import HomeFilter from "@/components/filters/HomeFilter";
 import LocalSearch from "@/components/search/localSearch";
 import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
-import handleError from "@/lib/handler/error";
-import { api } from "@/lib/api";
 import { auth } from "@/auth";
-// import dbConnect from "@/lib/mongoose";
+import { getQuestions } from "@/lib/actions/question.action";
 
-
-const questions = [
-  {
-    _id: "1",
-    title: "How to learn React?",
-    description: "I want to learn React, can anyone help me?",
-    tags: [
-      { _id: "1", name: "React" },
-      { _id: "2", name: "JavaScript" },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image:
-        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
-    },
-    upvotes: 10,
-    answers: 5,
-    views: 100,
-    createdAt: new Date(),
-  },
-  {
-    _id: "2",
-    title: "How to learn JavaScript?",
-    description: "I want to learn JavaScript, can anyone help me?",
-    tags: [
-      { _id: "1", name: "JavaScript" },
-      { _id: "2", name: "JavaScript" },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image:
-        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
-    },
-    upvotes: 10,
-    answers: 5,
-    views: 100,
-    createdAt: new Date("2021-09-01"),
-  },
-  {
-    _id: "3",
-    title: "How to learn python for web developer?",
-    description: "I want to learn React, can anyone help me?",
-    tags: [
-      { _id: "1", name: "Django" },
-      { _id: "2", name: "python" },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image:
-        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
-    },
-    upvotes: 10,
-    answers: 50,
-    views: 100,
-    createdAt: new Date(),
-  },
-];
-
-const test = async() => {
-  try {
-    //await dbConnect()
-    return await api.users.getAll();
-  } catch (error) {
-    return handleError(error);
-  }
-};
 interface SearchParams {
   searchParams: Promise<{ [key: string]: string }>;
 }
@@ -85,25 +14,27 @@ interface SearchParams {
 const Home = async ({ searchParams }: SearchParams) => {
   const session = await auth();
   console.log("Session: ",session);
-  const { query = "", filter = "" } = await searchParams;
+// display the contents from the database
+  const {page, pageSize, query, filter } = await searchParams;
 
-  const filteredQuestions = questions.filter((question) => {
-    const matchesQuery = question.title
-      .toLowerCase()
-      .includes(query.toLowerCase());
-    const matchesFilter = filter
-      ? question.tags[0].name.toLowerCase() === filter.toLowerCase()
-      : true;
-    return matchesQuery && matchesFilter;
+  const {success, data, error} = await getQuestions({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 10,
+    query: query || "",  // search query
+    filter: filter || "",
+    //sort: sort || "createdAt",
   });
 
+  // destructure the questions out from the data
+  const questions  = data?.questions || [];
+  const isNext = data?.isNext || false;
   return (
     <>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="h1-bold text-dark100_light900">All Questions</h1>
 
         <Button
-          className="primary-gradient min-h-[46px] px-4 py-3 !text-light-900"
+      className="primary-gradient min-h-[46px] px-4 py-3 !text-light-900"
           asChild
         >
           <Link href={ROUTES.ASK_QUESTION}>Ask a Question</Link>
@@ -118,11 +49,26 @@ const Home = async ({ searchParams }: SearchParams) => {
         />
       </section>
       <HomeFilter />
-      <div className="mt-10 flex w-full flex-col gap-6">
-        {filteredQuestions.map((question) => (
-          <QuestionCard key={question._id} question={question} />
-        ))}
-      </div>
+      {success ? (<div className="mt-10 flex w-full flex-col gap-6">
+        {questions && questions.length > 0 ? questions.map((question) => (
+          <QuestionCard key={String(question._id)} question={{
+            ...question, 
+            _id: String(question._id),
+            tags: question.tags.map((tag: any) => ({
+              _id: String(tag._id || tag),
+              name: tag.name || ''
+            }))
+          }} />
+        )) : (
+         <div className="flex w-full items-center justify-center py-10">
+           <p className="text-lg text-dark500_light700">No questions found</p>
+         </div>
+        )}
+      </div>) : (
+        <div className="flex w-full items-center justify-center py-10">
+          <p className="text-lg text-dark500_light700">Error loading questions</p>
+        </div>
+      )}
     </>
   );
 };

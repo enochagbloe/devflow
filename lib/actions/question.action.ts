@@ -7,14 +7,14 @@ import {
   GetQuestionSchema,
 } from "../validation";
 import action from "../handler/action";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 // Import models from centralized database index to ensure they're all registered
 import { Question, Tag, TagQuestion, User } from "@/database";
 import { IQuestionDoc } from "@/database/question.model";
-import { ActionResponse } from "@/types/global";
+import { ActionResponse, PaginationSearchParams } from "@/types/global";
 import handleError from "../handler/error";
 import { ITagDoc } from "@/database/tag.model";
-
+import { PaginationSearchParamsSchema } from "../validation";'/'
 // this have to handle different input such as title, tags, content, etc.
 export async function createQuestion(
   params: CreateQuestionParams
@@ -150,7 +150,7 @@ export async function editQuestion(
     if (tagsToAdd.length > 0) {
       for (const tag of tagsToAdd) {
         const existingTag = await Tag.findOneAndUpdate(
-          { name: { $regex: new RegExp(`^${tag}$`, "i") } },
+          { name: { $regex: `^${tag}$`, $options: "i" } },
           { $setOnInsert: { name: tag }, $inc: { questions: 1 } },
           { upsert: true, new: true, session }
         );
@@ -235,7 +235,9 @@ export async function getQuestion(
     console.log("🔍 About to query database...");
 
     // Try without populate first to test basic functionality
-    const question = await Question.findById(questionId).populate("tags", "_id name").populate("author", "_id name image");
+    const question = await Question.findById(questionId)
+      .populate("tags", "_id name")
+      .populate("author", "_id name image");
     // console.log(
     //   "🔍 Simple query completed. Found question:",
     //   question ? "Yes" : "No"
@@ -252,6 +254,90 @@ export async function getQuestion(
     };
   } catch (error) {
     console.log("❌ Error in getQuestion:", error);
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function getQuestions(
+  params: PaginationSearchParams
+): Promise<ActionResponse<{ questions: IQuestionDoc[]; isNext: boolean }>> {
+  // validate the data
+  const validationResult = await action({
+    params,
+    schema: PaginationSearchParamsSchema,
+  });
+
+  // handle the validation data
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const {
+    page = 1,
+    pageSize = 10,
+    query = "",
+    filter = "",
+    sort = "",
+  } = validationResult.params!;
+  // set the skip value
+  const skip = (Number(page) - 1) * Number(pageSize);
+  // set the limit
+  const limit = Number(pageSize);
+
+  // define the filters (found on the frontend)
+  const filterQuery: FilterQuery<typeof Question> = {};
+  if (filter === "recommended") {
+    return { success: true, data: { questions: [], isNext: false } };
+  }
+  // check if we have acces to the query
+  if (query) {
+    filterQuery.$or = [
+      { title: { $regex: new RegExp(query, "i") } },
+      { content: { $regex: new RegExp(query, "i") } },
+      { tags: { $elemMatch: { name: { $regex: new RegExp(query, "i") } } } },
+    ];
+  }
+  // sort criteria on the frontend
+  let sortCriteria = {}; // why let so that it can be modified later
+  switch (filter) {
+    case "newest":
+      sortCriteria = { createdAt: -1 };
+      break;
+    case "unanswered":
+      filterQuery.answers = 0;
+      sortCriteria = { createdAt: -1 };
+      break;
+    case "popular": {
+      sortCriteria = { upvotes: -1 };
+    }
+    default:
+      sortCriteria = { createdAt: -1 };
+      break;
+  }
+
+  try {
+    // check how many questions are there
+    const totalQuestions = await Question.countDocuments(filterQuery)
+    // fetch the questions based on the filter, query, and sort criteria
+    const questions = await Question.find(filterQuery)
+      .sort(sortCriteria)
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .populate("tags", "_id name")
+      .populate("author", "_id name image");
+
+      // check if the next page exists
+    const isNext = totalQuestions > skip + questions.length;
+
+    return{
+      success: true,
+      data: {
+        questions: JSON.parse(JSON.stringify(questions)),
+        isNext,
+      },
+    };
+  } catch (error) {
     return handleError(error) as ErrorResponse;
   }
 }
