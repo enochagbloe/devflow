@@ -19,7 +19,7 @@ const Home = async ({ searchParams }: SearchParams) => {
   // display the contents from the database
   const { page, pageSize, query, filter } = await searchParams;
 
-  const { success, data, error } = await getQuestions({
+  const { success, data } = await getQuestions({
     page: Number(page) || 1,
     pageSize: Number(pageSize) || 10,
     query: query || "", // search query
@@ -80,7 +80,8 @@ const Home = async ({ searchParams }: SearchParams) => {
               _id: String(tag._id || tag),
               name: tag.name || ''
             }))
-          }} />
+          }}
+           />
         )) : (
          <div className="flex w-full items-center justify-center py-10">
            <p className="text-lg text-dark500_light700">No questions found</p>

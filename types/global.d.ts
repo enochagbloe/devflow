@@ -28,7 +28,7 @@ type ActionResponse<T = null> = {
   success: boolean;
   data?: T;
   error?: {
-    massage: string;
+    message: string;
     details: Record<string, string[]>;
   };
   status?: number;
