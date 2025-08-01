@@ -1,3 +1,5 @@
+import { PaginationSearchParams } from "./global";
+
 interface SignInWithOAuthParams {
   provider: "github" | "google";
   providerAccountId: string;
@@ -23,16 +25,22 @@ interface AuthCredentials {
   password: string;
 }
 // for creating a question
-interface CreateQuestionParams{
-    title: string;
-    tags: string[];
-    content: string;
+interface CreateQuestionParams {
+  title: string;
+  tags: string[];
+  content: string;
 }
 
-interface EditQuestionParams extends CreateQuestionParams{
-    questionId: string
+interface EditQuestionParams extends CreateQuestionParams {
+  questionId: string;
 }
 
-interface GetQuestionParams{
-    questionId: string
+interface GetQuestionParams {
+  questionId: string;
+}
+
+interface GetTagQuestionsParams
+  extends PaginationSearchParams,
+    Omit<PaginationSearchParams, "filter"> {
+  tagId: string;
 }

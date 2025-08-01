@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
 import { auth } from "@/auth";
 import { getQuestions } from "@/lib/actions/question.action";
+import { Tag } from "@/types/global";
 // import { EMPTY_QUESTIONS } from "@/constants/states";
 // import DataRenderer from "@/components/Datarenderer";
 
@@ -79,7 +80,7 @@ const Home = async ({ searchParams }: SearchParams) => {
             tags: question.tags.map((tag: any) => ({
               _id: String(tag._id || tag),
               name: tag.name || ''
-            }))
+            }) as unknown as Tag)
           }}
            />
         )) : (
