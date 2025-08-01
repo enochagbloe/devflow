@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+import { JSX } from "react";
 
 interface Tag {
+  map(arg0: (question: any) => JSX.Element): import("react").ReactNode;
+  length: number;
   _id: string;
   name: string;
 }
