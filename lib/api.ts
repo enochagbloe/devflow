@@ -2,6 +2,7 @@ import { IAccount } from "@/database/account.model";
 import { IUser } from "@/database/user.model";
 import { fetchHandler } from "./handler/fetch";
 import ROUTES from "@/constants/routes";
+import { SignInWithOAuthParams } from "@/types/action";
 
 // Set your API_BASE_URL
 const API_BASE_URL =

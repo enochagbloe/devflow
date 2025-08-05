@@ -11,10 +11,11 @@ import mongoose, { FilterQuery } from "mongoose";
 // Import models from centralized database index to ensure they're all registered
 import { Question, Tag, TagQuestion, User } from "@/database";
 import { IQuestionDoc } from "@/database/question.model";
-import { ActionResponse, PaginationSearchParams } from "@/types/global";
+import { ActionResponse, ErrorResponse, PaginationSearchParams } from "@/types/global";
 import handleError from "../handler/error";
 import { ITagDoc } from "@/database/tag.model";
-import { PaginationSearchParamsSchema } from "../validation";'/'
+import { PaginationSearchParamsSchema } from "../validation";import { CreateQuestionParams, EditQuestionParams, GetQuestionParams } from "@/types/action";
+'/'
 // this have to handle different input such as title, tags, content, etc.
 export async function createQuestion(
   params: CreateQuestionParams
