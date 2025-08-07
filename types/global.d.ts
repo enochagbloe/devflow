@@ -8,7 +8,7 @@ interface Tag {
   name: string;
 }
 
-interface author {
+interface Author {
   _id: string;
   name: string;
   image: string;
