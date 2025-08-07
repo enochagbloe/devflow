@@ -7,6 +7,7 @@ import ROUTES from "@/constants/routes";
 import { getQuestion } from "@/lib/actions/question.action";
 import { formatViewsNumber, getTimeStamp } from "@/lib/utils";
 import { Question, RouteParams } from "@/types/global";
+import Views  from "../Views";
 import Link from "next/link";
 
 
@@ -15,7 +16,7 @@ import React from "react";
 
 // This is the page that displays the question details
 // It fetches the question by ID and displays its content, author, tags, and other
-const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
+const QuestionDetails = async ({ params }: RouteParams) => {
   const { id } = await params;
   // Fetch the question by ID
 const { success, data:question } = await getQuestion({
@@ -30,6 +31,9 @@ if (!success || !question) return redirect(ROUTES.NOT_FOUND);
 
   return (
     <>
+    {/* Increment views when the question details are viewed */}
+    <Views questionId={id} />
+      {/* Question details layout */}
       <div className="flex-start w-full flex-col">
         <div className="w-full flex flex-col-reverse justify-between">
           <div className="flex items-center justify-start gap-1">

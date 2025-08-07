@@ -5,6 +5,7 @@ import {
   AskQuestionShema,
   EditQuestionSchema,
   GetQuestionSchema,
+  incrementViewsSchema,
 } from "../validation";
 import action from "../handler/action";
 import mongoose, { FilterQuery } from "mongoose";
@@ -25,6 +26,8 @@ import {
   GetQuestionParams,
   incrementViewsParams,
 } from "@/types/action";
+import { revalidatePath } from "next/cache";
+import ROUTES from "@/constants/routes";
 ("/");
 // this have to handle different input such as title, tags, content, etc.
 export async function createQuestion(
@@ -348,6 +351,39 @@ export async function getQuestions(
         questions: JSON.parse(JSON.stringify(questions)),
         isNext,
       },
+    };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+// for incrementing the views of the question
+export async function incrementViews(params: incrementViewsParams):Promise<ActionResponse<{view:string}>> {
+  // validate the data
+  const validationResult = await action({
+    params,
+    schema: incrementViewsSchema,
+  });
+  // handle the validation data
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+  const{questionId} = validationResult.params!;
+
+  try {
+    // find the question from the database with it's id
+    const question = await Question.findById(questionId);
+    if(!question) throw new Error("Question not found");
+    // increment the views
+    question.views += 1;
+    // save the question
+    await question.save();
+    revalidatePath(ROUTES.QUESTION(questionId));
+    return {
+      success: true,
+      data: {
+        view: question.views.toString()
+      }
     };
   } catch (error) {
     return handleError(error) as ErrorResponse;
