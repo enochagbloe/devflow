@@ -44,3 +44,7 @@ interface GetTagQuestionsParams
     Omit<PaginationSearchParams, "filter"> {
   tagId: string;
 }
+
+interface incrementViewsParams {
+  questionId: string;
+}

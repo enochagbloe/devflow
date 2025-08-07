@@ -11,11 +11,21 @@ import mongoose, { FilterQuery } from "mongoose";
 // Import models from centralized database index to ensure they're all registered
 import { Question, Tag, TagQuestion, User } from "@/database";
 import { IQuestionDoc } from "@/database/question.model";
-import { ActionResponse, ErrorResponse, PaginationSearchParams } from "@/types/global";
+import {
+  ActionResponse,
+  ErrorResponse,
+  PaginationSearchParams,
+} from "@/types/global";
 import handleError from "../handler/error";
 import { ITagDoc } from "@/database/tag.model";
-import { PaginationSearchParamsSchema } from "../validation";import { CreateQuestionParams, EditQuestionParams, GetQuestionParams } from "@/types/action";
-'/'
+import { PaginationSearchParamsSchema } from "../validation";
+import {
+  CreateQuestionParams,
+  EditQuestionParams,
+  GetQuestionParams,
+  incrementViewsParams,
+} from "@/types/action";
+("/");
 // this have to handle different input such as title, tags, content, etc.
 export async function createQuestion(
   params: CreateQuestionParams
@@ -208,7 +218,7 @@ export async function editQuestion(
   }
 }
 
-// the fuction that gets the question to edit
+// this function gets the question to edit and to view it details page of that questions found on the home page
 export async function getQuestion(
   params: GetQuestionParams
 ): Promise<ActionResponse<typeof Question>> {
@@ -259,6 +269,7 @@ export async function getQuestion(
   }
 }
 
+// this function will be used to get all questions on the home page
 export async function getQuestions(
   params: PaginationSearchParams
 ): Promise<ActionResponse<{ questions: IQuestionDoc[]; isNext: boolean }>> {
@@ -318,7 +329,7 @@ export async function getQuestions(
 
   try {
     // check how many questions are there
-    const totalQuestions = await Question.countDocuments(filterQuery)
+    const totalQuestions = await Question.countDocuments(filterQuery);
     // fetch the questions based on the filter, query, and sort criteria
     const questions = await Question.find(filterQuery)
       .sort(sortCriteria)
@@ -328,10 +339,10 @@ export async function getQuestions(
       .populate("tags", "_id name")
       .populate("author", "_id name image");
 
-      // check if the next page exists
+    // check if the next page exists
     const isNext = totalQuestions > skip + questions.length;
 
-    return{
+    return {
       success: true,
       data: {
         questions: JSON.parse(JSON.stringify(questions)),

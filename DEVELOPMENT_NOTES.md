@@ -298,6 +298,104 @@ export const formatViewsNumber = (views: number): string => {
 - ✅ Sample data integration
 - ✅ Component composition
 - ✅ Responsive design
-- 🔄 Content rendering (in progress)
+- ✅ Content rendering with MDX support
 - ⏳ Real data integration (planned)
 - ⏳ Voting functionality (planned)
+
+## Preview Component Implementation
+
+### File Location
+
+`components/editor/Preview.tsx`
+
+### Code Implementation
+
+```tsx
+import { MDXRemote } from "next-mdx-remote/rsc";
+
+export const Preview = ({ content }: { content: string }) => {
+  try {
+    // Handle undefined or null content
+    if (!content) {
+      return (
+        <section className="prose dark:prose-invert max-w-none">
+          <p>No content available</p>
+        </section>
+      );
+    }
+
+    // Clean and format the content more safely
+    const formattedContent = content
+      .replace(/\\/g, "")
+      .replace(/&#x20;/g, " ")
+      .trim();
+
+    // Validate that we have actual content to render
+    if (!formattedContent) {
+      return (
+        <section className="prose dark:prose-invert max-w-none">
+          <p>Content is empty</p>
+        </section>
+      );
+    }
+
+    return (
+      <section className="prose dark:prose-invert max-w-none">
+        <MDXRemote
+          source={formattedContent}
+          options={{
+            parseFrontmatter: false,
+          }}
+        />
+      </section>
+    );
+  } catch (error) {
+    console.error("Error rendering MDX content:", error);
+
+    // Fallback to simple markdown-like rendering
+    return (
+      <section className="prose dark:prose-invert max-w-none">
+        <div className="fallback-content">
+          <h3 className="text-yellow-600 dark:text-yellow-400 mb-2">
+            Content Preview (Fallback Mode)
+          </h3>
+          <div className="whitespace-pre-wrap text-sm border-l-4 border-gray-300 pl-4 bg-gray-50 dark:bg-gray-800 p-4 rounded">
+            {content}
+          </div>
+        </div>
+      </section>
+    );
+  }
+};
+```
+
+### Features
+
+- **MDX Support**: Renders markdown with JSX components
+- **Error Handling**: Graceful fallback when MDX parsing fails
+- **Content Validation**: Checks for empty or null content
+- **Typography Styling**: Uses Tailwind's prose classes for beautiful text rendering
+- **Dark Mode Support**: Automatic dark mode styling with `dark:prose-invert`
+
+### Dependencies
+
+- `next-mdx-remote`: For server-side MDX rendering
+- `@tailwindcss/typography`: For prose styling classes
+
+### Error Fixes Applied
+
+1. **Scope Issue**: Moved content destructuring inside component function
+2. **Error Boundaries**: Added try-catch for MDX rendering failures
+3. **Content Validation**: Added checks for undefined/empty content
+4. **Fallback Rendering**: Alternative display when MDX fails
+
+### Integration
+
+The Preview component is imported and used in the question details page:
+
+```tsx
+import { Preview } from "@/components/editor/Preview";
+
+// Inside the component JSX:
+<Preview content={content} />;
+```
