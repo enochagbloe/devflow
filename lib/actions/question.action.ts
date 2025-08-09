@@ -26,9 +26,7 @@ import {
   GetQuestionParams,
   incrementViewsParams,
 } from "@/types/action";
-import { revalidatePath } from "next/cache";
-import ROUTES from "@/constants/routes";
-("/");
+
 // this have to handle different input such as title, tags, content, etc.
 export async function createQuestion(
   params: CreateQuestionParams
@@ -378,7 +376,7 @@ export async function incrementViews(params: incrementViewsParams):Promise<Actio
     question.views += 1;
     // save the question
     await question.save();
-    revalidatePath(ROUTES.QUESTION(questionId));
+    
     return {
       success: true,
       data: {
