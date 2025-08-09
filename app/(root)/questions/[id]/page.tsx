@@ -4,12 +4,10 @@ import { Preview } from "@/components/editor/Preview";
 import Metric from "@/components/Metric";
 import UserAvatar from "@/components/UserAvatar";
 import ROUTES from "@/constants/routes";
-import { getQuestion } from "@/lib/actions/question.action";
+import { getQuestion, incrementViews } from "@/lib/actions/question.action";
 import { formatViewsNumber, getTimeStamp } from "@/lib/utils";
 import { Question, RouteParams } from "@/types/global";
-import Views  from "../Views";
 import Link from "next/link";
-
 
 import { redirect } from "next/navigation";
 import React from "react";
@@ -18,21 +16,26 @@ import React from "react";
 // It fetches the question by ID and displays its content, author, tags, and other
 const QuestionDetails = async ({ params }: RouteParams) => {
   const { id } = await params;
-  // Fetch the question by ID
-const { success, data:question } = await getQuestion({
-  questionId: id
-});
-if (!success || !question) return redirect(ROUTES.NOT_FOUND);
+
+  const [_, { success, data: question }] = await Promise.all([
+    // getQuestion server call
+    await getQuestion({
+      questionId: id,
+    }),
+    // increment views server call
+    await incrementViews({ questionId: id }),
+  ]);
+
+  if (!success || !question) return redirect(ROUTES.NOT_FOUND);
 
   // Type assertion to properly type the question data
   const questionData = question as unknown as Question;
   // Destructure all needed properties including content
-  const { author, createdAt, answers, views, tags, content, title } = questionData;
+  const { author, createdAt, answers, views, tags, content, title } =
+    questionData;
 
   return (
     <>
-    {/* Increment views when the question details are viewed */}
-    <Views questionId={id} />
       {/* Question details layout */}
       <div className="flex-start w-full flex-col">
         <div className="w-full flex flex-col-reverse justify-between">
@@ -103,4 +106,3 @@ if (!success || !question) return redirect(ROUTES.NOT_FOUND);
 };
 
 export default QuestionDetails;
-

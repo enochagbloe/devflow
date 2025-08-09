@@ -104,4 +104,4 @@ export const formatViewsNumber = (views: number): string => {
   } else {
     return views.toString();
   }
-}
+};
