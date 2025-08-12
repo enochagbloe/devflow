@@ -1,5 +1,6 @@
 import TagCard from "@/components/card/TagCard";
 import { Preview } from "@/components/editor/Preview";
+import AnswerForm from "@/components/forms/AnswerForm";
 
 import Metric from "@/components/Metric";
 import UserAvatar from "@/components/UserAvatar";
@@ -18,12 +19,10 @@ const QuestionDetails = async ({ params }: RouteParams) => {
   const { id } = await params;
 
   const [_, { success, data: question }] = await Promise.all([
-    // getQuestion server call
-    await getQuestion({
-      questionId: id,
-    }),
     // increment views server call
     await incrementViews({ questionId: id }),
+    // getQuestion server call
+    await getQuestion({ questionId: id }),
   ]);
 
   if (!success || !question) return redirect(ROUTES.NOT_FOUND);
@@ -101,6 +100,9 @@ const QuestionDetails = async ({ params }: RouteParams) => {
           />
         ))}
       </div>
+      <section className="mt-16 w-full">
+        <AnswerForm />
+      </section>
     </>
   );
 };
