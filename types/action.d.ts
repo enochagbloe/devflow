@@ -52,3 +52,8 @@ interface incrementViewsParams {
 interface viewIncrementParams {
   questionId: string;
 }
+
+interface CreateAnswerParams {
+  questionId: string;
+  content: string;
+}
