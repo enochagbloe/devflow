@@ -67,6 +67,7 @@ type PaginationSearchParams = {
 }
 
 interface Answer {
+  _id: Key | null | undefined;
   author: Author;
   content: string;
   createdAt?: Date;

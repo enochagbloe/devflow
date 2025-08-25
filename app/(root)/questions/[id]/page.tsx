@@ -1,3 +1,4 @@
+import AnswerPage from "@/components/answers/page";
 import TagCard from "@/components/card/TagCard";
 import { Preview } from "@/components/editor/Preview";
 import AnswerForm from "@/components/forms/AnswerForm";
@@ -8,7 +9,7 @@ import ROUTES from "@/constants/routes";
 import { getAllAnswers } from "@/lib/actions/answer.actions";
 import { getQuestion, incrementViews } from "@/lib/actions/question.action";
 import { formatViewsNumber, getTimeStamp } from "@/lib/utils";
-import { Question, RouteParams } from "@/types/global";
+import { Answer, Question, RouteParams } from "@/types/global";
 import Link from "next/link";
 
 import { redirect } from "next/navigation";
@@ -37,6 +38,8 @@ const QuestionDetails = async ({ params }: RouteParams) => {
 
   console.log("success:", areAnswersLoaded, "Answers Results:", answersResults, "Error:", answersError);
 
+// const answerData = answersResults?.answers as unknown as Answer[];
+// const { createdAt } = answerData;
   // Type assertion to properly type the question data
   const questionData = question as unknown as Question;
   // Destructure all needed properties including content
@@ -110,6 +113,16 @@ const QuestionDetails = async ({ params }: RouteParams) => {
           />
         ))}
       </div>
+      <section className="mt-16 w-full">
+        <AnswerPage
+          success={areAnswersLoaded}
+          error={answersError}
+          data={answersResults?.answers as unknown as Answer[] | undefined}
+          totalAnswers={answersResults?.totalAnswers ?? 0}
+          author={author}
+          answer={answersResults?.answers as unknown as Answer}
+        />
+      </section>
       <section className="mt-16 w-full">
         <AnswerForm questionId={id} />
       </section>
