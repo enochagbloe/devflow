@@ -65,3 +65,11 @@ type PaginationSearchParams = {
   filter?: string; // for filtering items
   sort?: string; // for sorting items
 }
+
+interface Answer {
+  author: Author;
+  content: string;
+  createdAt?: Date;
+  upvotes: number;
+  downvotes: number;
+}

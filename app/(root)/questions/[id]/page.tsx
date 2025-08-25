@@ -5,6 +5,7 @@ import AnswerForm from "@/components/forms/AnswerForm";
 import Metric from "@/components/Metric";
 import UserAvatar from "@/components/UserAvatar";
 import ROUTES from "@/constants/routes";
+import { getAllAnswers } from "@/lib/actions/answer.actions";
 import { getQuestion, incrementViews } from "@/lib/actions/question.action";
 import { formatViewsNumber, getTimeStamp } from "@/lib/utils";
 import { Question, RouteParams } from "@/types/global";
@@ -26,6 +27,15 @@ const QuestionDetails = async ({ params }: RouteParams) => {
   ]);
 
   if (!success || !question) return redirect(ROUTES.NOT_FOUND);
+
+  //Render the getAnswer server action here
+  const { success: areAnswersLoaded, data: answersResults, error: answersError } = await getAllAnswers({ questionId: id,
+    page: 1,
+    pageSize: 5,
+    filter: "latest"
+  });
+
+  console.log("success:", areAnswersLoaded, "Answers Results:", answersResults, "Error:", answersError);
 
   // Type assertion to properly type the question data
   const questionData = question as unknown as Question;
