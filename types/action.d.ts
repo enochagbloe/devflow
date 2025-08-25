@@ -52,3 +52,12 @@ interface incrementViewsParams {
 interface viewIncrementParams {
   questionId: string;
 }
+
+interface CreateAnswerParams {
+  questionId: string;
+  content: string;
+}
+// for the get all answers
+interface GetAllAnswersParams extends PaginationSearchParams {
+  questionId: string;
+}

@@ -145,6 +145,14 @@ export const incrementViewsSchema = z.object({
 });
 
 export const AnswerSchema = z.object({
-  content: z.string().min(100, { message: "Content is required." }),
+  content: z.string().min(10, { message: "Content should be at least 10 characters long." }),
   //questionId: z.string().min(1, { message: "Question ID is required." }),
+});
+
+export const AnswerServerSchema = AnswerSchema.extend({
+  questionId: z.string().min(1, { message: "Question ID is required." }),
+});
+
+export const GetAllAnswerSchema = PaginationSearchParamsSchema.extend({
+  questionId: z.string().min(1, { message: "Question ID is required." }),
 });
