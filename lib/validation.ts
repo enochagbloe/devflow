@@ -69,11 +69,11 @@ export const AskQuestionShema = z.object({
 
 export const EditQuestionSchema = AskQuestionShema.extend({
   questionId: z.string().min(1, { message: "Question ID is required." }),
-})
+});
 
 export const GetQuestionSchema = z.object({
   questionId: z.string().min(1, { message: "Question ID is required." }),
-})
+});
 
 export const UserSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
@@ -92,7 +92,7 @@ export const UserSchema = z.object({
 });
 
 export const AccountSchema = z.object({
- userId: z.string().min(1, { message: "User ID is required." }),
+  userId: z.string().min(1, { message: "User ID is required." }),
   name: z.string().min(1, { message: "Name is required." }),
   image: z.string().url({ message: "Please provide a valid URL." }).optional(),
   password: z
@@ -118,18 +118,27 @@ export const AccountSchema = z.object({
 
 export const signInWithOAuthSchema = z.object({
   provider: z.enum(["github", "google"]),
-  providerAccountId: z.string().min(1, { message: "Provider account ID is required." }),
+  providerAccountId: z
+    .string()
+    .min(1, { message: "Provider account ID is required." }),
   user: z.object({
     name: z.string().min(1, { message: "Name is required." }),
-    email: z.string().email({ message: "Please provide a valid email address." }),
-    username: z.string().min(3, { message: "Username must be at least 3 characters long." }),
-    image: z.string().url('Invalid image URL.').optional(),
-  })
+    email: z
+      .string()
+      .email({ message: "Please provide a valid email address." }),
+    username: z
+      .string()
+      .min(3, { message: "Username must be at least 3 characters long." }),
+    image: z.string().url("Invalid image URL.").optional(),
+  }),
 });
 
 export const PaginationSearchParamsSchema = z.object({
   page: z.number().min(1, { message: "Page must be at least 1." }).default(1),
-  pageSize: z.number().min(1, { message: "Page size must be at least 1." }).default(10),
+  pageSize: z
+    .number()
+    .min(1, { message: "Page size must be at least 1." })
+    .default(10),
   query: z.string().optional(),
   filter: z.string().optional(),
   sort: z.string().optional(),
@@ -145,7 +154,9 @@ export const incrementViewsSchema = z.object({
 });
 
 export const AnswerSchema = z.object({
-  content: z.string().min(10, { message: "Content should be at least 10 characters long." }),
+  content: z
+    .string()
+    .min(10, { message: "Content should be at least 10 characters long." }),
   //questionId: z.string().min(1, { message: "Question ID is required." }),
 });
 
@@ -155,4 +166,14 @@ export const AnswerServerSchema = AnswerSchema.extend({
 
 export const GetAllAnswerSchema = PaginationSearchParamsSchema.extend({
   questionId: z.string().min(1, { message: "Question ID is required." }),
+});
+
+export const AIAnswerSchema = z.object({
+  questionId: z
+    .string()
+    .min(5, { message: "Question ID is required." })
+    .max(130, { message: "Question cannot exceed 130 characters long." }),
+  content: z
+    .string()
+    .min(30, { message: "Content should be at least 30 characters long." }),
 });

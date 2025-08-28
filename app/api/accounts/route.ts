@@ -1,6 +1,6 @@
 import Account from "@/database/account.model";
 import handleError from "@/lib/handler/error";
-import { ForbiddenError, ValidationError } from "@/lib/http.errors";
+import { ForbiddenError } from "@/lib/http.errors";
 import dbConnect from "@/lib/mongoose";
 import { AccountSchema } from "@/lib/validation";
 import { APIErrorResponse } from "@/types/global";
