@@ -69,12 +69,11 @@ export const api = {
       fetchHandler(`${API_BASE_URL}/accounts/${id}`, { method: "DELETE" }),
   },
   // define your ai methods
-  ai:{
-    getAnswer: (question:string, content:string) => {
-      return fetchHandler(`${API_BASE_URL}/ai/answers`, {
+  ai: {
+    getAnswer: (question: string, content: string, userAnswer?: string) =>
+      fetchHandler(`${API_BASE_URL}/ai/answers`, {
         method: "POST",
-        body: JSON.stringify({ question, content }),
-      });
-    }
-  }
+        body: JSON.stringify({ question, content, userAnswer }),
+      }),
+  },
 };

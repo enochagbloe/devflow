@@ -20,6 +20,8 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { createAnswer } from "@/lib/actions/answer.actions";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { api } from "@/lib/api";
 // interface AuthFormProps<T extends FieldValues> {
 //   schema: ZodType<T>;
 //   defaultValues: T;
@@ -32,9 +34,18 @@ const Editor = dynamic(() => import("@/components/editor"), {
 
 interface AnswerFormProps {
   questionId: string;
+  questionContent: string;
+  questionTitle: string;
 }
 
-const AnswerForm = ({ questionId }: AnswerFormProps) => {
+const AnswerForm = ({
+  questionId,
+  questionContent,
+  questionTitle,
+}: AnswerFormProps) => {
+  // check if the user has login
+  const session = useSession();
+
   const Ref = useRef<MDXEditorMethods>(null);
   // for submitting the form
   const [isSubmittingTransaction, startTransition] = useTransition();
@@ -58,12 +69,55 @@ const AnswerForm = ({ questionId }: AnswerFormProps) => {
       if (!result.success) {
         form.reset();
         toast.error("Failed to create answer");
+
+        if (Ref.current) {
+          Ref.current.setMarkdown("");
+        } else {
+          toast.error("Please login to create an answer");
+        }
       } else {
         toast.success("Answer created successfully");
       }
       setIsAiSubmitting(false);
     });
   };
+
+  const generateAIAnswer = async () => {
+    if (!session.data) {
+      toast.error("Please login to create an answer");
+      return;
+    }
+    setIsAiSubmitting(true);
+    const userAnswer = Ref.current?.getMarkdown();
+
+    try {
+      const { data, success } = await api.ai.getAnswer(questionContent, questionTitle, userAnswer)
+
+      if (!success) {
+        toast.error("Failed to generate answer");
+      } else {
+        toast.success("Answer generated successfully");
+      }
+
+      const formattedResponse = typeof data === 'string' 
+        ? data.replace(/<br>/g, " ").trim()
+        : "";
+      if (Ref.current) {
+        Ref.current.setMarkdown(formattedResponse);
+        form.setValue("content", formattedResponse);
+        form.trigger("content");
+      }
+
+      toast.success("Answer generated successfully");
+
+    } catch (error) {
+      toast.error("Failed to generate answer");
+    } finally {
+      setIsAiSubmitting(false);
+    }
+  };
+
+
 
   return (
     <div>
@@ -72,6 +126,7 @@ const AnswerForm = ({ questionId }: AnswerFormProps) => {
         <Button
           className="btn light-border-2"
           disabled={isSubmittingTransaction}
+          onClick={generateAIAnswer}
         >
           {isAiSubmitting ? (
             <>
