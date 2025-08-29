@@ -161,7 +161,7 @@ const QuestionDetails = async ({ params }: RouteParams) => {
         <Metric
           imgUrl="/icons/eye.svg"
           alt="eye value"
-          value={formatViewsNumber(views)}
+          value={formatNumber(views)}
           title=""
           textStyles="text-dark200_light700 small-regular"
         />
@@ -272,10 +272,10 @@ Three key metrics displayed horizontally:
 
 ### Utility Functions (`lib/utils.ts`)
 
-Added `formatViewsNumber()` function:
+Added `formatNumber()` function:
 
 ```typescript
-export const formatViewsNumber = (views: number): string => {
+export const formatNumber = (views: number): string => {
   if (views >= 1000000) {
     return (views / 1000000).toFixed(1) + "M";
   } else if (views >= 1000) {

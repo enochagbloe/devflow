@@ -5,10 +5,11 @@ import AnswerForm from "@/components/forms/AnswerForm";
 
 import Metric from "@/components/Metric";
 import UserAvatar from "@/components/UserAvatar";
+import Votes from "@/components/Votes/Votes";
 import ROUTES from "@/constants/routes";
 import { getAllAnswers } from "@/lib/actions/answer.actions";
 import { getQuestion, incrementViews } from "@/lib/actions/question.action";
-import { formatViewsNumber, getTimeStamp } from "@/lib/utils";
+import { formatNumber, getTimeStamp } from "@/lib/utils";
 import { Answer, Question, RouteParams } from "@/types/global";
 import Link from "next/link";
 
@@ -43,8 +44,7 @@ const QuestionDetails = async ({ params }: RouteParams) => {
   // Type assertion to properly type the question data
   const questionData = question as unknown as Question;
   // Destructure all needed properties including content
-  const { author, createdAt, answers, views, tags, content, title } =
-    questionData;
+  const { author, createdAt, answers, views, tags, content, title, upvotes, downvotes } = questionData;
 
   return (
     <>
@@ -68,7 +68,12 @@ const QuestionDetails = async ({ params }: RouteParams) => {
           </div>
           {/* second part of the layout */}
           <div className="flex justify-end">
-            <p>Votes</p>
+            <Votes
+              upvotes={questionData.upvotes}
+              downvotes={questionData.downvotes}
+              hasVoted={true}
+              hasDownVoted={false}
+            />
           </div>
         </div>
         <h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full">
@@ -94,7 +99,7 @@ const QuestionDetails = async ({ params }: RouteParams) => {
         <Metric
           imgUrl="/icons/eye.svg"
           alt="eye value"
-          value={formatViewsNumber(views)}
+          value={formatNumber(views)}
           title=""
           textStyles="text-dark200_light700 small-regular"
         />
