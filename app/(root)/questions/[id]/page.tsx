@@ -124,7 +124,7 @@ const QuestionDetails = async ({ params }: RouteParams) => {
         />
       </section>
       <section className="mt-16 w-full">
-        <AnswerForm questionId={id} />
+        <AnswerForm questionId={questionData._id} questionContent={questionData.content} questionTitle={questionData.title} />
       </section>
     </>
   );
