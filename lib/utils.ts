@@ -96,7 +96,7 @@ export const getTimeStamp = (createdAt: Date): string => {
   return `${years} year${years !== 1 ? "s" : ""} ago`;
 };
 
-export const formatViewsNumber = (views: number): string => {
+export const formatNumber = (views: number): string => {
   if (views >= 1000000){
     return (views / 1000000).toFixed(1) + 'M';
   } else if (views >= 1000) {
