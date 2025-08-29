@@ -91,33 +91,35 @@ const AnswerForm = ({
     const userAnswer = Ref.current?.getMarkdown();
 
     try {
-      const { data, success } = await api.ai.getAnswer(questionContent, questionTitle, userAnswer)
+      const { data, success } = await api.ai.getAnswer(
+        questionContent,
+        questionTitle,
+        userAnswer
+      );
 
       if (!success) {
-        toast.error("Failed to generate answer");
+        toast.error("AI Answer is unavailable");
+      } else if (!userAnswer) {
+        toast.error("Please Provide an answer");
       } else {
-        toast.success("Answer generated successfully");
+        toast.success("AI Answer generated successfully");
       }
 
-      const formattedResponse = typeof data === 'string' 
-        ? data.replace(/<br>/g, " ").trim()
-        : "";
+      const formattedResponse =
+        typeof data === "string" ? data.replace(/<br>/g, " ").trim() : "";
       if (Ref.current) {
         Ref.current.setMarkdown(formattedResponse);
         form.setValue("content", formattedResponse);
         form.trigger("content");
       }
 
-      toast.success("Answer generated successfully");
-
+      // toast.success("Answer generated successfully");
     } catch (error) {
-      toast.error("Failed to generate answer");
+      toast.error("AI Answer is unavailable");
     } finally {
       setIsAiSubmitting(false);
     }
   };
-
-
 
   return (
     <div>
