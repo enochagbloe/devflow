@@ -61,3 +61,14 @@ interface CreateAnswerParams {
 interface GetAllAnswersParams extends PaginationSearchParams {
   questionId: string;
 }
+
+interface createVoteParams {
+  // the votes should work for both questions and answers
+  targetId: string;
+  targetType: "question" | "answer";
+  voteType: "upvote" | "downvote";
+}
+
+interface updateVoteCountParams extends createVoteParams {
+  change: 1 | -1;
+}
