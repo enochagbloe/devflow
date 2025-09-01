@@ -2,10 +2,16 @@
 import {
   createVoteParams,
   ErrorResponse,
+  HasVotedResponse,
+  HasVoteParams,
   updateVoteCountParams,
 } from "@/types/action";
 import action from "../handler/action";
-import { createVoteSchema, updateVoteCountSchema } from "../validation";
+import {
+  createVoteSchema,
+  hasVotedSchema,
+  updateVoteCountSchema,
+} from "../validation";
 import handleError from "../handler/error";
 import { ActionResponse } from "@/types/global";
 import mongoose from "../mongoose";
@@ -44,7 +50,7 @@ export const updateVoteCountAction = async (
         new Error("Failed to update vote count")
       ) as ErrorResponse;
     }
-    
+
     return { success: true };
   } catch (error) {
     return handleError(error) as ErrorResponse;
@@ -153,5 +159,48 @@ export const CreateVoteAction = async (
     return handleError(error) as ErrorResponse;
   } finally {
     session.endSession();
+  }
+};
+
+export const HasVotedAction = async (
+  params: HasVoteParams
+): Promise<ActionResponse<HasVotedResponse>> => {
+  const validatedResults = await action({
+    params,
+    schema: hasVotedSchema,
+    authorize: true,
+  });
+  if (validatedResults instanceof Error) {
+    return handleError(validatedResults) as ErrorResponse;
+  }
+  // extract the data from the validatedResults
+  const { targetId, targetType } = validatedResults.params!;
+  //check if the user is logged in
+  const userId = validatedResults.session?.user?.id;
+
+  try {
+    //get access to the votes
+    const vote = await Vote.findOne({
+      actionId: targetId,
+      actionType: targetType,
+      author: userId,
+    });
+    if (!vote) {
+      return {
+        success: true,
+        data: { hasUpVoted: false, hasDownvoted: false },
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        hasUpVoted: vote.voteType === "up",
+        hasDownvoted: vote.voteType === "down",
+      },
+    };
+    
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
   }
 };
