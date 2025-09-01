@@ -99,7 +99,7 @@ export const CreateVoteAction = async (
     );
 
     if (existingVote) {
-      if (existingVote === voteType) {
+      if (existingVote.voteType === voteType) {
         await Vote.deleteOne({ _id: existingVote._id }, { session });
         // update the vote count
         await updateVoteCountAction(
@@ -195,11 +195,11 @@ export const HasVotedAction = async (
     return {
       success: true,
       data: {
-        hasUpVoted: vote.voteType === "up",
-        hasDownvoted: vote.voteType === "down",
+        hasUpVoted: vote.voteType === "upvote",
+        hasDownvoted: vote.voteType === "downvote",
       },
     };
-    
+
   } catch (error) {
     return handleError(error) as ErrorResponse;
   }
